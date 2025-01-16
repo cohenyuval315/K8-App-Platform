@@ -1,0 +1,2 @@
+class AuthorizationInternalService:
+    pass

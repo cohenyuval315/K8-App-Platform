@@ -1,0 +1,52 @@
+
+ARG PYTHON_VERSION
+ARG DOCKER_IMAGE_SUFFIX=""
+
+FROM python:${PYTHON_VERSION}${DOCKER_IMAGE_SUFFIX}
+
+# RUN sudo apt-get install build-essential cargo # FOR bcrypt
+
+ARG PYTHON_PATH
+ARG DOCKER_ROOT_DIR
+ARG ENVIRONMENT
+ARG PWD
+
+# security
+ARG DOCKER_USER
+ARG DOCKER_USER_ID
+ARG DOCKER_USER_GROUP
+ARG DOCKER_USER_GROUP_ID
+ARG DEPENDANCIES
+
+USER root
+
+RUN mkdir -p /${DOCKER_ROOT_DIR}
+
+WORKDIR /${DOCKER_ROOT_DIR}
+
+
+RUN groupadd -g ${DOCKER_USER_GROUP_ID} ${DOCKER_USER_GROUP} && \
+    useradd -m -u ${DOCKER_USER_ID} -g ${DOCKER_USER_GROUP} ${DOCKER_USER}
+
+RUN chown -R ${DOCKER_USER} /${DOCKER_ROOT_DIR}
+
+RUN apt-get update
+
+USER ${DOCKER_USER}
+
+
+# dependancies
+# RUN pip install --no-cache-dir pip-tools
+
+COPY ./pyproject.toml ${DOCKER_ROOT_DIR}/pyproject.toml
+# RUN pip-compile --output-file=requirements.txt pyproject.toml --extra {DEPENDANCIES}
+# RUN pip install --no-cache-dir -r requirements.txt
+# RUN rm -rf requirements.txt
+
+RUN pip install ./${DOCKER_ROOT_DIR}[${DEPENDANCIES}]
+
+ENV RUN_IN_DOCKER=1
+ENV PYTHONPATH=${PYTHON_PATH}
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV ENVIRONMENT=${ENVIRONMENT}

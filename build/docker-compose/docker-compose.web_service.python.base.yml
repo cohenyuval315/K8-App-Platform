@@ -1,0 +1,20 @@
+services:
+  service:
+    container_name: ${SERVICE_CONTAINER_NAME}
+    build:
+      context: ${PWD}
+      dockerfile: ${PWD}/build/.docker/Dockerfile.python
+      args:
+        PYTHON_VERSION: ${PYTHON_VERSION}
+        PYTHON_PATH: ${PYTHON_PATH}
+        PWD: ${PWD}
+        DEPENDANCIES: ${DEPENDANCIES}
+        DOCKER_ROOT_DIR: ${DOCKER_ROOT_DIR}
+        DOCKER_IMAGE_SUFFIX: ${DOCKER_IMAGE_SUFFIX:--slim}
+        ENVIRONMENT: ${ENVIRONMENT:-development}
+        DOCKER_USER: ${DOCKER_USER:-docker}
+        DOCKER_USER_ID: ${DOCKER_USER_ID:-1234}
+        DOCKER_USER_GROUP: ${DOCKER_USER_GROUP:-customgroup}
+        DOCKER_USER_GROUP_ID: ${DOCKER_USER_GROUP_ID:-1234}
+
+    command: sleep infinity

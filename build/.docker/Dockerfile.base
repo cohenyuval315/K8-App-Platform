@@ -1,0 +1,34 @@
+FROM ubuntu:latest
+
+ARG ENVIRONMENT
+ARG USER="docker"
+ARG GROUP="dockers"
+ARG GROUP_ID=9999
+ARG USER_ID=1234
+ARG DOCKER_ROOT="code"
+
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    git \
+    curl \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# yq
+
+
+RUN groupadd -g ${GROUP_ID} ${GROUP} && \
+useradd -m -u ${USER_ID} -g ${GROUP} ${USER}
+
+USER root
+
+RUN mkdir /${DOCKER_ROOT}
+RUN chown -R ${USER} /${DOCKER_ROOT}
+
+RUN apt-get update
+
+USER ${USER}
+
+ENV RUN_IN_DOCKER=1
+ENV ENVIRONMENT=${ENVIRONMENT}

@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "python debugger",
+            "type": "debugpy",
+            "request": "attach",
+            "listen": {
+                "host": "127.0.0.1",
+                "port": 5678
+            }
+        }
+
+    ]
+
+}

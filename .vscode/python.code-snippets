@@ -1,0 +1,198 @@
+{
+	"Create Python Class with Docstring": {
+		"prefix": "classdoc",
+		"body": [
+			"class ${1:ClassName}:",
+			"    \"\"\"",
+			"    Class: ${1:ClassName}",
+			"    Description: ${2:Description}",
+			"    \"\"\"",
+			"    def __init__(self, ${3:args}):",
+			"        ${4:pass}"
+		],
+		"description": "Generate a Python class with a docstring"
+	},
+
+	"Define Python Function": {
+		"prefix": "def",
+		"body": [
+			"def ${1:function_name}(${2:args}):",
+			"    \"\"\"",
+			"    ${3:Function description}",
+			"    \"\"\"",
+			"    ${4:pass}"
+		],
+		"description": "Generate a Python function definition"
+	},
+
+	"Python Main Block": {
+		"prefix": "main",
+		"body": [
+			"if __name__ == \"__main__\":",
+			"    ${1:pass}"
+		],
+		"description": "Create a main block for Python scripts"
+	},
+
+	"Python Main Test Block": {
+		"prefix": "test",
+		"body": [
+			"if __name__ == \"__main__\":",
+			"    ${1:from pymicroservicesbase.testing.basetest}",
+			"    ${1:BaseTest.main()}"
+		],
+		"description": "Create a main test block for Python scripts"
+	},
+
+
+	"Property Getter and Setter": {
+		"prefix": "prop",
+		"body": [
+			"@property",
+			"def ${1:property_name}(self):",
+			"    \"\"\"",
+			"    Getter for ${1:property_name}",
+			"    \"\"\"",
+			"    return self._${1:property_name}",
+			"",
+			"@${1:property_name}.setter",
+			"def ${1:property_name}(self, ${1:property_name}) -> None:",
+			"    \"\"\"",
+			"    Setter for ${1:property_name}",
+			"    \"\"\"",
+			"    self._${1:property_name} = ${1:property_name}"
+		],
+		"description": "Generate a property with getter and setter methods"
+	},
+
+	"Context Manager": {
+		"prefix": "ctxmgr",
+		"body": [
+			"from contextlib import contextmanager",
+			"",
+			"@contextmanager",
+			"def ${1:context_name}(${2:args}):",
+			"    try:",
+			"        ${3:# Setup code here}",
+			"        yield ${4:resource}",
+			"    finally:",
+			"        ${5:# Teardown code here}"
+		],
+		"description": "Create a context manager"
+	},
+
+	"File Handling": {
+		"prefix": "filehandle",
+		"body": [
+			"with open('${1:filename}', '${2:mode}') as ${3:file}:",
+			"    ${4:content} = ${3:file}.read()",
+			"    ${5:print(content)}"
+		],
+		"description": "Generate a file handling snippet"
+	},
+
+	"Regex Search": {
+		"prefix": "regex",
+		"body": [
+			"import re",
+			"",
+			"pattern = re.compile(r\"${1:pattern}\")",
+			"match = pattern.search(\"${2:string}\")",
+			"if match:",
+			"    print(match.group())"
+		],
+		"description": "Perform a regex search"
+	},
+
+
+	"Python Decorator": {
+		"prefix": "decorator",
+		"body": [
+			"def ${1:decorator}(func):",
+			"    def wrapper(*args, **kwargs):",
+			"        ${2:# Pre-function actions}",
+			"        result = func(*args, **kwargs)",
+			"        ${3:# Post-function actions}",
+			"        return result",
+			"    return wrapper",
+			"",
+			"@${1:decorator}",
+			"def ${4:my_function}():",
+			"    ${5:print(\"Hello World!\")}"
+		],
+		"description": "Generate a Python decorator template"
+	},
+
+	"Class Function Decorator": {
+		"prefix": "classdecorator",
+		"body": [
+			"def ${1:decorator}(func):",
+			"    def wrapper(self, *args, **kwargs):",
+			"        ${2:# Pre-function actions}",
+			"        result = func(self, *args, **kwargs)",
+			"        ${3:# Post-function actions}",
+			"        return result",
+			"    return wrapper",
+			"",
+			"class ${4:MyClass}:",
+			"    @${1:decorator}",
+			"    def ${5:method_name}(self, ${6:args}):",
+			"        ${7:print(\"Method logic here\")} ",
+			"        ${8:return None}"
+		],
+		"description": "Create a class function decorator"
+	},
+
+	"Try Except Block": {
+		"prefix": "_try_except",
+		"body": [
+			"try:",
+			"    pass",
+			"except ${1:Exception} as e:",
+			"    pass",
+		],
+		"description": "Generate a try-except block"
+	},
+
+	"Try Except Else": {
+		"prefix": "_try_except_else",
+		"body": [
+			"try:",
+			"    pass",
+			"except ${1:Exception} as e:",
+			"    pass",
+			"else:   ",
+			"    pass",
+		],
+		"description": "Generate a try-except-finally block"
+	},
+
+	"Try Except Else Finally": {
+		"prefix": "_try_except_else_finally",
+		"body": [
+			"try:",
+			"    pass",
+			"except ${1:Exception} as e:",
+			"    pass",
+			"else:   ",
+			"    pass:",
+			"finally:",
+			"    pass",
+		],
+		"description": "Generate a try-except-finally block"
+	},
+
+
+	"Try Except Finally Block": {
+		"prefix": "_try_except_finally",
+		"body": [
+			"try:",
+			"    pass",
+			"except ${1:Exception} as e:",
+			"    pass",
+			"finally:",
+			"    pass",
+		],
+		"description": "Generate a try-except block"
+	}
+}

@@ -1,0 +1,116 @@
+{
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+  "name": "Pymicroservicesbase",
+
+  // "runArgs":[ // docker cli arguments
+  //   "--cap-add=SYS_PTRACE",
+  //   "--security-opt",
+  //   "seccomp=unconfined"
+  // ],
+
+  // ---- Docker Compose START ----
+  // "dockerComposeFile":[],
+  // "service":"",
+  // "runServices":[],
+  // "workspaceFolder":"/",
+  // ---- Docker Compose END   ----
+
+
+  "build": {
+    "context": "..",
+    "dockerfile": "./Dockerfile",
+    "args": {
+      "HOME_DIR": "/home",
+      "WORKSPACE": "/workspace",
+      "PYTHON_VERSION":"3.11",
+      "PYTHON_PATH": "/workspace",
+      "USER": "docker",
+      "GROUP": "dockers",
+      "USER_ID": "2143",
+      "GROUP_ID": "9123",
+      "USER_PASSWORD": "123456"
+    }
+  },
+  "customizations":{
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.debugpy",
+        "charliermarsh.ruff",
+        "streetsidesoftware.code-spell-checker",
+        "dbaeumer.vscode-eslint",
+        "mutantdino.resourcemonitor",
+      ]
+    }
+  },
+  // "postCreateCommand": "pip install -r /workspace/.devcontainer/requirements.txt",
+  // "$schema": "",
+  // "mounts":[],
+  // "forwardPorts":[]
+
+
+  // "containerEnv":"",
+  "containerUser":"docker",
+  // "remoteEnv":"",
+  "remoteUser": "root",
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+
+  // "mounts": [
+  //   "source=${localWorkspaceFolder},target=/workspace,type=bind"
+  // ]
+
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1":{},
+    "ghcr.io/devcontainers/features/docker-in-docker:2":{},
+    "ghcr.io/devcontainers/features/python:1":{},
+    "ghcr.io/rocker-org/devcontainer-features/apt-packages:1":{},
+
+    // "ghcr.io/devcontainers/features/common-utils:2":{},
+    // "ghcr.io/devcontainers/features/git:1":{},
+    // "ghcr.io/jsburckhardt/devcontainer-features/ruff:1": {},
+    // "ghcr.io/devcontainers/features/kubectl-helm-minikube:1":{},
+    // "ghcr.io/devcontainers/features/aws-cli:1":{},
+    // "ghcr.io/devcontainers/features/git-lfs:1":{},
+    // "ghcr.io/devcontainers/features/github-cli:1":{},
+    // "ghcr.io/devcontainers/features/sshd:1":{},
+
+    // "ghcr.io/devcontainers/features/node:1":{},
+
+    // "ghcr.io/devcontainers/features/nvidia-cuda:1":{},
+    // "ghcr.io/audacioustux/devcontainers/localstack:1":{},
+    // "ghcr.io/localstack/devcontainer-feature/localstack-cli:0":{},
+
+
+    // "ghcr.io/jsburckhardt/devcontainer-features/ruff:1":{},
+    // "ghcr.io/jsburckhardt/devcontainer-features/uv:1":{},
+
+
+
+    // "ghcr.io/gvatsal60/dev-container-features/pre-commit:1":{}, // pip
+
+    //pipx
+    // "ghcr.io/hspaans/devcontainer-features/pytest:1":{},
+    // "ghcr.io/prulloac/devcontainer-features/pre-commit:1":{},
+    // "ghcr.io/devcontainers-extra/features/pre-commit:2":{},
+
+    // "ghcr.io/devcontainers-extra/features/black:2":{},
+    // "ghcr.io/hspaans/devcontainer-features/pyupgrade:1":{},
+    // "ghcr.io/devcontainers-extra/features/bandit:2":{},
+    // "ghcr.io/devcontainers-extra/features/isort:2":{},
+    // "ghcr.io/devcontainers-extra/features/mypy:2":{},
+    // "ghcr.io/devcontainers-extra/features/pylint:2":{},
+
+    // "ghcr.io/devcontainers-extra/features/ruff:1":{},
+    // "ghcr.io/va-h/devcontainers-features/uv:1":{},
+    // "ghcr.io/devcontainers-extra/features/tox:2":{},
+    // "ghcr.io/devcontainers-extra/features/poetry:2":{},
+    // "ghcr.io/devcontainers-extra/features/pipx-package:1":{},
+    // "ghcr.io/devcontainers-extra/features/nox:2":{}
+
+  }
+}

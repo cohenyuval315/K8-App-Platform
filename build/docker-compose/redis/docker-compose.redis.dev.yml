@@ -1,0 +1,75 @@
+services:
+  redisinsight:
+    image: "redis/redisinsight:latest"
+    container_name: redisinsight
+    ports:
+      - "5540:5540"
+    # depends_on:
+    #   - redis-cluster-creator
+
+  # redis-cluster-creator:
+  #   image: redis:latest
+  #   ports:
+  #     - 6999:6999
+  #   networks:
+  #     - redis-network
+  #   command: >
+  #     redis-cli -p 7000 --cluster create
+  #     redis-node-1:7000
+
+  #     --cluster-replicas 1
+  #     --cluster-yes
+  #   depends_on:
+  #     # - redis-acl-setup
+  #     - redis-node-1
+
+  # redis-acl-setup:
+  #   image: redis:latest
+  #   container_name: redis-acl-setup
+  #   command: >
+  #     sh -c "
+  #     until redis-cli -h redis-node-1 -p 6379 -a $REDIS_PASSWORD ping | grep -q 'PONG'; do
+  #       echo 'Waiting for Redis...';
+  #       sleep 3;
+  #     done;
+
+  #     redis-cli -h redis-node-1 -p 6379 -a $REDIS_PASSWORD acl setuser redis_user >redis_password on allchannels allkeys +get +set +del;
+  #     redis-cli -h redis-node-1 -p 6379 -a $REDIS_PASSWORD acl setuser another_user >another_password on +get +set;
+
+  #     "
+  #   depends_on:
+  #     - redis-node-1
+
+  # redis-node-1:
+  redis:
+    image: redis/redis-stack-server:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+      - "7000:7000"
+
+    # command: redis-server --cluster-enabled yes --cluster-node-timeout 5000 --appendonly yes
+    # networks:
+    #   - redis-network
+
+
+
+    # volumes:
+    #   - redis_data:/var/lib/redis/data
+      # - REDISEARCH_ARGS
+      # - REDISJSON_ARGS
+      # - REDISTIMESERIES_ARGS
+      # - REDISBLOOM_ARGS
+
+    # pwd`/local-redis-stack.conf:/redis-stack.conf
+    # command: /bin/sh -c "redis-server --user redisuser on --requirepass 1234 "
+
+
+    # volumes:
+    #   - postgres_data:/var/lib/postgresql/data
+
+networks:
+  redis-network:
+    driver: bridge
+  backend-dev-network:
+    external: true

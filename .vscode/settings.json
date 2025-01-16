@@ -1,0 +1,132 @@
+{
+  "window.zoomLevel": 0,
+  "workbench.tree.indent": 20,
+  "editor.cursorBlinking": "smooth",
+  // "files.autoSave": "afterDelay", // For Auto Save
+  "editor.semanticHighlighting.enabled": false,
+  "editor.occurrencesHighlight": "off",
+
+/**************************************/
+/**** Python ****/
+/**************************************/
+  "[python]": {
+      "editor.formatOnType": false,
+      "editor.wordBasedSuggestions": "matchingDocuments",
+
+      "editor.codeActionsOnSave": {
+          "source.organizeImports": "always", // For Isort
+          "source.fixAll.pylance": "always",
+          "source.unusedImports": "always",
+          "source.convertImportFormat": "always",
+          "source.fixAll": "always", // explicit
+          "source.organizeLinkDefinitions": "always",
+          "source.fixAll.eslint":"always",
+      },
+
+      "editor.rulers": [
+          79 // pep8
+      ],
+
+      // "editor.defaultFormatter": "ms-python.autopep8",
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "ms-python.black-formatter",
+      // "editor.defaultFormatter": "charliermarsh.ruff",
+      "editor.formatOnPaste": false,
+      "editor.formatOnSaveMode": "file"
+  },
+
+
+  "python.languageServer": "Pylance",
+
+
+
+/**************************************/
+/**** Python Analysis ****/
+/**************************************/
+  "python.analysis.indexing": false,
+  "python.analysis.autoIndent": false,
+  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.languageServerMode": "default",
+  "python.analysis.importFormat": "absolute",
+  "python.analysis.logLevel": "Information",
+  "python.analysis.aiCodeActions": {
+    "implementAbstractClasses": true
+  },
+  "python.analysis.enablePytestSupport": true,
+  "python.analysis.fixAll": [],
+  "python.analysis.inlayHints.callArgumentNames": "off",
+  "python.analysis.inlayHints.functionReturnTypes": false,
+  "python.analysis.inlayHints.pytestParameters": false,
+  "python.analysis.inlayHints.variableTypes": false,
+  "python.analysis.supportRestructuredText": false,
+  "python.testing.pytestEnabled": true,
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.completeFunctionParens": false,
+  "python.analysis.autoFormatStrings": true,
+  "python.analysis.gotoDefinitionInStringLiteral": false,
+
+
+/**************************************/
+/**** Python Extensions****/
+/**************************************/
+
+  "ruff.configuration": "./pyproject.toml",
+
+  // disabled extensions:
+  // "flake8.args": [
+  //     "--config=${workspaceFolder}/.flake8"
+  // ],
+  // "pylint.enabled": true,
+  // "pylint.args": [
+  //     "--rcfile=${workspaceFolder}/pyproject.toml"
+  // ],
+
+  "indentRainbow.lightIndicatorStyleLineWidth": 2,
+  "indentRainbow.includedLanguages": ["python"],
+  "indentRainbow.indicatorStyle": "classic",
+  "indentRainbow.colors": [
+      "rgba(255,255,64,0.07)",
+      "rgba(127,255,127,0.07)",
+      "rgba(255,127,255,0.07)",
+      "rgba(79,236,236,0.07)"
+  ],
+  "indentRainbow.errorColor": "rgba(128,32,32,0.6)",
+  "indentRainbow.tabmixColor": "rgba(128,32,96,0.6)",
+  "indentRainbow.ignoreLinePatterns" : [
+      "/[ \t]* [*]/g", // lines begining with <whitespace><space>*
+      "/[ \t]+[/]{2}/g" // lines begininning with <whitespace>//
+  ],
+  "indentRainbow.colorOnWhiteSpaceOnly": true, // false is the default
+
+
+/**************************************/
+/**** Python Testing****/
+/**************************************/
+    // "python.testing.autoTestDiscoverOnSaveEnabled": true,
+    // "python.testing.pytestArgs": ["tests"],
+    // "python.testing.unittestEnabled": false,
+    // "python.testing.pytestPath": "pytest",
+    // "python.testing.debugPort": 3000,
+    // "python.testing.cwd": "",
+    // "python.testing.promptToConfigure": true,
+    // "python.testing.unittestEnabled": false,
+    // "python.testing.unittestArgs": [
+    //     "-v",
+    //     "-s",
+    //     ".",
+    //     "-p",
+    //     "*test*.py"
+    // ],
+
+  "dev.containers.defaultFeatures": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "remote.extensionKind": {
+    // "pub.name": [
+    //   "ui"
+    // ]
+  },
+
+
+  "cSpell.enabled": false
+}

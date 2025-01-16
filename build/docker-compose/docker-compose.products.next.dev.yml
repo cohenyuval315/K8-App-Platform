@@ -1,0 +1,44 @@
+services:
+  service:
+    container_name: ${UI_CONTAINER_NAME}
+    volumes:
+      - ${PWD}/pymicroservicesbase/products/${UI_PATH}:/${DOCKER_ROOT_DIR}
+      # - ${PWD}/pymicroservicesbase/products/${UI_PATH}/node_modules:/${DOCKER_ROOT_DIR}/node_modules
+      # - node_modules:/${DOCKER_ROOT_DIR}/node_modules
+
+    stdin_open: true
+    tty: true
+    ports:
+      - ${UI_PORT}:${UI_PORT}
+      - ${DEBUGGER_PORT}:${DEBUGGER_PORT}
+
+    environment:
+      - PORT=${UI_PORT}
+
+    command: [
+      "node",
+      # "--inspect=0.0.0.0:9229",
+      "--allow-worker",
+      # "pymicroservicesbase/products/${UI_PATH}/node_modules/.bin/next",
+      # "dev"
+      "node_modules/.bin/next",  # Run next from the correct directory
+      "dev"
+    ]
+    networks:
+      - frontend-dev-network
+
+    # command: sleep infinity
+
+
+# volumes:
+#   node_modules:
+#     # driver: local
+#     # driver_opts:
+#     #   type: none
+#     #   o: bind
+#     #   device: ${PWD}/pymicroservicesbase/products/${UI_PATH}/node_modules
+
+
+networks:
+  frontend-dev-network:
+    external: true

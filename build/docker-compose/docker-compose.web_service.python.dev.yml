@@ -1,0 +1,36 @@
+services:
+  service:
+    container_name: ${SERVICE_CONTAINER_NAME}
+    volumes:
+      # - ${PWD}/pymicroservicesbase/services/${SERVICE_DIR_NAME}:/${DOCKER_ROOT_DIR}/pymicroservicesbase/services/${SERVICE_DIR_NAME}
+      # - ${PWD}/pymicroservicesbase/sdk:/${DOCKER_ROOT_DIR}/pymicroservicesbase/sdk
+      - ${PWD}/pymicroservicesbase:/${DOCKER_ROOT_DIR}/pymicroservicesbase
+      # - ${PWD}/pyproject.toml:/${DOCKER_ROOT_DIR}/pyproject.toml
+
+    ports:
+      - ${SERVICE_PORT}:${SERVICE_PORT}
+      - ${DEBUGGER_PORT}:${DEBUGGER_PORT}
+
+    command: [
+      "python3",
+      "-m",
+      "uvicorn",
+      "pymicroservicesbase.services.${SERVICE_DIR_NAME}.main:app",
+      "--reload",
+      "--no-server-header",
+      "--no-date-header",
+      "--use-colors",
+      "--lifespan", "on",
+      "--host", "${SERVICE_HOST}",
+      "--port", "${SERVICE_PORT}",
+      "--log-level=debug"
+    ]
+    networks:
+      - backend-dev-network
+      - frontend-dev-network
+
+networks:
+  frontend-dev-network:
+    external: true
+  backend-dev-network:
+    external: true

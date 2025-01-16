@@ -1,0 +1,6 @@
+.git
+.vscode
+.pytest_cache
+__pycache__
+venv
+pre-commit.log

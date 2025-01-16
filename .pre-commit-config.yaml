@@ -1,0 +1,121 @@
+
+exclude: '^$'
+minimum_pre_commit_version: '0'
+fail_fast: false
+default_language_version: {}
+repos:
+
+
+# ----------------------- PRE COMMIT HOOKS-----------------------
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # - id: check-yaml
+      # - id: end-of-file-fixer
+      # - id: trailing-whitespace
+      # # - id: check-added-large-files
+      # - id: check-case-conflict
+      # # - id: check-docstring-first
+      # - id: check-shebang-scripts-are-executable
+      # - id: check-merge-conflict
+      # - id: check-json
+      # - id: check-toml
+      # - id: check-xml
+      # - id: check-yaml
+      # - id: debug-statements
+      # - id: destroyed-symlinks
+      # - id: detect-private-key
+      # - id: end-of-file-fixer
+      #   exclude: ^LICENSE|\.(html|csv|txt|svg|py)$
+      # - id: pretty-format-json
+      #   args: ["--autofix", "--no-ensure-ascii", "--no-sort-keys"]
+      # - id: requirements-txt-fixer
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        exclude: \.(html|svg)$
+
+
+  - repo: https://github.com/psf/black
+    rev: 24.10.0
+    hooks:
+    -   id: black
+        files: \.py$
+
+# ----------------------- RUFF -----------------------
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.1
+    hooks:
+    - id: ruff
+      language_version: python3
+      args: [--fix, --exit-non-zero-on-fix, --show-fixes]
+      files: \.py$
+    # - id: ruff-format
+    #   files: \.py$
+
+# ----------------------- AUTOPEP8 -----------------------
+
+# -   repo: https://github.com/hhatto/autopep8
+#     rev: ...  # select the tag or revision you want, or run `pre-commit autoupdate`
+#     hooks:
+#     -   id: autopep8
+
+
+
+# ----------------------- PYRIGHT(PYLANCE) -----------------------
+  # - repo: https://github.com/RobertCraigie/pyright-python
+  #   rev: v1.1.392.post0
+  #   hooks:
+  #     - id: pyright
+  #       files: \.py$
+
+
+
+# ----------------------- PYUPDATE -----------------------
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.19.1
+    hooks:
+    -   id: pyupgrade
+        files: \.py$
+
+# ----------------------- CREOSOTE -----------------------
+  # - repo: https://github.com/fredrikaverpil/creosote
+  #   rev: v3.2.0
+  #   hooks:
+  #     - id: creosote
+  #       args:
+  #         - --deps-file=pyproject.toml
+  #         - --section=project.dependencies
+  #       files: \.py$
+
+# ----------------------- CODESPELL -----------------------
+  # - repo: https://github.com/codespell-project/codespell
+  #   rev: v2.3.0
+  #   hooks:
+  #   - id: codespell
+  #     additional_dependencies:
+  #       - tomli
+
+
+# ----------------------- MYPY -----------------------
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: 'v1.14.1'
+  #   hooks:
+  #     - id: mypy
+  #       args: [--strict, --ignore-missing-imports]
+  #       additional_dependencies:
+  #         - "pydantic>=1.10.0,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0"
+  #       files: \.py$
+
+  # -   repo: local
+  #     hooks:
+
+  # - repo: local
+  #   hooks:
+  #     - id: ""
+  #       name: ""
+  #       entry: ""
+  #       language: python
+  #       additional_dependencies:
+  #         - ""

@@ -1,0 +1,10 @@
+{
+  "extends": ["next/babel","next/core-web-vitals"], // ["next/core-web-vitals"] //,"next/babel","prettier"]
+  "root": true,
+  "rules": {},
+  "ignorePatterns":["next-env.d.ts"],
+  "settings": {
+
+  }
+
+}

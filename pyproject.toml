@@ -1,0 +1,357 @@
+# ===========================================================
+#                       BUILD SYSTEM
+# ===========================================================
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["microservices"]
+
+# ===========================================================
+#                       PROJECT INFO
+# ===========================================================
+
+[project]
+name = "microservice"
+version = "1.0.0"
+requires-python = ">= 3.11"
+authors = [
+  {name = "Yuval Cohen", email = "cohenyuval315@gmail.com"}
+]
+maintainers = [
+  {name = "Yuval Cohen", email = "cohenyuval315@gmail.com"}
+]
+description = "description"
+keywords = ["microservices"]
+classifiers = [
+  "Programming Language :: Python"
+]
+
+# ===========================================================
+#                       DEPENDENCIES
+# ===========================================================
+
+dependencies=[
+  "Cython",
+  "httpx[socks,http2]",
+  "chardet",
+  "anyio",
+  "toml",
+  "tomli",
+  "types-toml",
+  "PyYAML",
+  "async-timeout",
+  "user_agents",
+  "uvloop",
+  "rich",
+  "rich-cli",
+  "rich_click",
+  "click",
+  "pydantic",
+  "pyOpenSSL",
+  "requests",
+  "watchdog",
+  "debugpy",
+  "pytz",
+  "docker",
+  "aiodocker",
+  "json-repair",
+  "tenacity",
+  "pathspec",
+  "protobuf",
+  "python-dotenv",
+  "setproctitle",
+  "itsdangerous",
+  "orjson",
+  "charset-normalizer",
+  "brotlipy",
+  "zstandard",
+  "truststore",
+  "trustme",
+  "aiofiles",
+  "numpy"
+]
+
+
+[project.urls]
+Homepage = "https://github.com/cohenyuval315/PyMicroservicesBase"
+Documentation = "https://github.com/cohenyuval315/PyMicroservicesBase"
+Repository = "https://github.com/cohenyuval315/PyMicroservicesBase.git"
+"Bug Tracker" = "https://github.com/cohenyuval315/PyMicroservicesBase/issues"
+Changelog = "https://github.com/cohenyuval315/PyMicroservicesBase/blob/main/CHANGELOG.md"
+
+
+
+# ===========================================================
+#                       OPTIONAL DEPENDENCIES
+# ===========================================================
+
+[project.optional-dependencies]
+web = [
+  "fastapi[all]",
+  "uvicorn[standard]",
+  "prometheus-fastapi-instrumentator",
+  "fastapi-sessions",
+  "fastapi-limiter",
+]
+
+dev = [
+  # "flake8",
+  # "flake8-pyproject",
+  # "flake8-bugbear",
+  # "pylint",
+  # "pylint-pydantic",
+  # "autopep8",
+  # "poetry"
+
+  # "bandit[toml]",
+  "black",
+  "ruff",
+  "debugpy",
+  "pre-commit",
+  "pip-tools",
+  "mypy",
+  "pyupgrade",
+  "codespell",
+  "creosote",
+  "build",
+  "slotscheck",
+  "cibuildwheel",
+  "hatchling",
+  "psutil",
+]
+
+testing = [
+  "pytest",
+  "pytest-mock",
+  "pytest-httpx",
+  "pytest-cov",
+  "pytest-xdist",
+  "pytest-asyncio",
+  # "pytest-asyncio-cooperative", # must remove pytest-asyncio
+  "pytest-jsonschema",
+  "pytest-bdd",
+  "pytest-json",
+  "pytest-html",
+  "pytest-ordering",
+  "pytest-timeout",
+  "pytest-dotenv",
+  "Faker",
+  "locust",
+]
+
+
+
+prod = [
+  "gunicorn",
+  "socketify",
+]
+
+worker = [
+  "celery",
+  "celery[redis]",
+  "redis",                 # offical Redis python distribution  - has asyncio and cluster support since certain version
+]
+
+
+sql = [
+  "sqlalchemy[asyncio]",
+  "asyncpg",               # Asynchronous PostgreSQL client
+  "psycopg[binary]",       # to use create all , you need this , is sync
+  "alembic",
+]
+
+mongo = [
+  "pymongo"
+]
+
+monitor = [
+  "py-spy",
+  "PySnooper",
+  "pyinstrument",
+  "pympler",
+  "apscheduler",
+  "memray",
+  "line_profiler"
+]
+
+other = [
+  "python-magic",
+  "pycountry",
+]
+
+security = [
+  "Authlib",
+  "passlib[bcrypt]",
+  "cryptography",
+  "fastapi-csrf-protect",
+  "pyotp",
+  "pyjwt"
+]
+
+
+
+# ===========================================================
+#                       TOOLS
+# ===========================================================
+
+# ----------------------- CODESPELL -----------------------
+[tool.codespell]
+ignore-words-list = "te, yuval"
+skip = '*.po,*.ts,./src/3rdParty,./src/Test'
+count = true
+quiet-level = 3
+
+
+# ----------------------- BLACK -----------------------
+
+[tool.black]
+line-length = 79
+preview = true
+
+
+# ----------------------- ISORT -----------------------
+
+[tool.isort]
+profile = "black"
+
+
+# ----------------------- VERMIN -----------------------
+
+# ----------------------- PYLINT -----------------------
+# [tool.pylint]
+# max-line-length = 79
+# disable=[
+#   "C0103",
+#   "C0303",
+#   "C0114",
+#   "W0612",
+#   "C0301",
+#   "W0613",
+#   "E1101",
+#   "E1102",
+#   "R0903",
+#   "W0143",
+#   "C0115",
+#   "R0913",
+#   "R0901",
+#   "C0116",
+# ]
+
+
+# ----------------------- FLAKE8 -----------------------
+
+# [tool.flake8]
+# max-line-length = 79
+# extend-ignore = ["E203", "E701","E501"]
+# ignore=["__init__.py"]
+
+
+# ----------------------- AUTOPEP8 -----------------------
+
+# [tool.autopep8]
+# max_line_length = 79
+# ignore = "E501,W6"  # or ["E501", "W6"]
+# in-place = true
+# recursive = true
+# aggressive = 3
+
+
+# ----------------------- BANDIT -----------------------
+# [tool.bandit]
+# skips = ["B101", "B303"]
+# include = ["*.py"]
+
+
+# ----------------------- MYPY -----------------------
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
+follow_imports = "silent"
+
+
+#  ----------------- RUFF -----------------
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = [
+  "E402", #
+  "F401" # remove unused imports
+]
+
+#  ----------------- CREOSOTE -----------------
+[tool.creosote]
+venvs=[".venv"]
+paths=["src"]
+deps-file="pyproject.toml"
+sections=["project.dependencies"]
+exclude-deps =[
+  "pyodbc",
+  "pg8000",
+]
+
+# ----------------------- PYRIGHT/PYLANCE -----------------------
+
+[tool.pyright]
+include = ["src"]
+ignore = ["**/typings"]
+
+# ----------------------- PYTEST -----------------------
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+pythonpath="."
+asyncio_mode = "auto"
+python_files = [
+  "test_*.py",
+  "tests*.py",
+  "*test.py",
+  "*tests.py",
+]
+python_functions = [
+  "test_*",
+  "*_test"
+]
+asyncio_default_fixture_loop_scope = "session"
+filterwarnings = [
+  "ignore:jsonschema.RefResolutionError",
+  # "ignore:PydanticDeprecatedSince20"
+]
+testpaths = [
+    "tests",
+    "pymicroservicesbase/sdk/cache/tests"
+]
+addopts = [
+  "--import-mode=importlib",
+  "-rfs",
+  "-vv",
+  "--noconftest",
+  "--capture=sys",
+  "-x",
+  # "--pdb",
+  "--no-header",
+  "--log-disable=faker"
+
+  # "--trace"
+  # "--ff",
+  # "--cache-show",
+]
+required_plugins = [
+
+]
+
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "serial",
+]
+
+log_level="DEBUG"
+
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(name)s  %(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"

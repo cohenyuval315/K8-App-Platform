@@ -1,0 +1,59 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+ARG ENVIRONMENT
+ARG DOCKER_ROOT
+
+ARG PYTHON_VERSION
+ARG PYTHON_PATH
+
+# dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cargo \
+    libssl-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    llvm \
+    libncurses5-dev \
+    libncursesw5-dev \
+    xz-utils \
+    tk-dev \
+    liblzma-dev \
+    python3-openssl \
+    libffi-dev \
+    libgdbm-dev \
+    libnss3-dev \
+    libssl-dev \
+    libyaml-dev \
+    libsqlite3-dev \
+    libreadline-dev \
+    libncurses5-dev \
+    libtool \
+    libgdbm-dev \
+    libgmp-dev \
+    libbz2-dev \
+    libexpat1-dev \
+    liblzma-dev \
+    zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# pipx -for cli applications. e,g pandoc
+# pyenv
+RUN curl https://pyenv.run | bash
+
+# Configure pyenv for user
+RUN echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> ~/.bashrc && \
+    echo 'eval "$(pyenv init --path)"' >> ~/.bashrc && \
+    echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+
+# Install a default Python version
+RUN ~/.pyenv/bin/pyenv install ${PYTHON_VERSION} && \
+    ~/.pyenv/bin/pyenv global ${PYTHON_VERSION}
+
+# Set pyenv environment variables
+ENV PATH="/root/.pyenv/shims:${PATH}"
+ENV PYTHONPATH=${PYTHON_PATH}
