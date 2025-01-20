@@ -31,9 +31,9 @@ repos:
       # - id: pretty-format-json
       #   args: ["--autofix", "--no-ensure-ascii", "--no-sort-keys"]
       # - id: requirements-txt-fixer
-      # - id: trailing-whitespace
-      #   args: [--markdown-linebreak-ext=md]
-      #   exclude: \.(html|svg)$
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        exclude: \.(html|svg)$
 
 
   # - repo: https://github.com/psf/black
