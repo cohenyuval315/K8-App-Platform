@@ -16,6 +16,8 @@ logs
 cert.perm
 /_temp/
 *.pem*
+
+*.next
 # Exclude .env.example from being ignored
 !.secrets/
 !.env.example
