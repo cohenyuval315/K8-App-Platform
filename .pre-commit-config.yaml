@@ -25,7 +25,7 @@ repos:
       # - id: check-yaml
       # - id: debug-statements
       # - id: destroyed-symlinks
-      # - id: detect-private-key
+      - id: detect-private-key
       - id: end-of-file-fixer
         exclude: ^LICENSE|\.(html|csv|txt|svg|py)$
       - id: pretty-format-json
