@@ -2,7 +2,8 @@
 exclude: '^$'
 minimum_pre_commit_version: '0'
 fail_fast: false
-default_language_version: {}
+default_language_version:
+  python: python3.11
 repos:
 
 
@@ -36,11 +37,16 @@ repos:
         exclude: \.(html|svg)$
 
 
-  # - repo: https://github.com/psf/black
-  #   rev: 24.10.0
-  #   hooks:
-  #   -   id: black
-  #       files: \.py$
+# ----------------------- BLACK -----------------------
+
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 24.8.0
+    hooks:
+      - id: black-jupyter
+        files: \.ipynb$
+      - id: black
+        files: \.py$
+        language_version: python3.11
 
 # ----------------------- RUFF -----------------------
 
