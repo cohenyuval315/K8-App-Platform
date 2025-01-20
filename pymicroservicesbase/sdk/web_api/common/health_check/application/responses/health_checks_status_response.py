@@ -1,11 +1,9 @@
 from typing import List
+from pymicroservicesbase.sdk.web_api.common.health_check.health_checks.health_check_ping import (
+    HealthCheckStatus,
+)
 from pymicroservicesbase.sdk.web_api.core_api.responses.base_response_schema import (
     BaseResponseSchema,
-)
-
-
-from pymicroservicesbase.sdk.web_api.common.health_check.health_check_status import (
-    HealthCheckStatus,
 )
 
 

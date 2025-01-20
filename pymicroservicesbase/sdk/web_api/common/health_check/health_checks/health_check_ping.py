@@ -1,5 +1,11 @@
-from ..health_check_status import HealthCheckStatus
-from ..base_health_check import BaseHealthCheck
+# from ..health_check_status import HealthCheckStatus
+# from .base_health_check import BaseHealthCheck
+
+
+from pymicroservicesbase.sdk.web_api.common.health_check import BaseHealthCheck
+from pymicroservicesbase.sdk.web_api.common.health_check.domain.health_check.base_health_check import (
+    HealthCheckStatus,
+)
 
 
 class HealthCheckPing(BaseHealthCheck):

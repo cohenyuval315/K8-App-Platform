@@ -5,15 +5,12 @@ from pymicroservicesbase.sdk.web_api.common.logging.api.controllers.logging_cont
 from pymicroservicesbase.sdk.web_api.common.logging.application.commands.get_logs_command import (
     GetLogsCommand,
 )
-from pymicroservicesbase.sdk.web_api.common.logging.application.responses.logs_response import (
-    LogsResponse,
-)
 
 logging_router = WebRouter(prefix="/logging", tags=["logging"])
 
 
-@logging_router.get("", status_code=200, response_model=LogsResponse)
+@logging_router.get("", status_code=200)
 async def get_logs(
     command: GetLogsCommand, logging_controller: LoggingControllerDep
-) -> LogsResponse:
+):
     return await logging_controller.get_logs(command)

@@ -1,4 +1,12 @@
-from typing import Annotated, List, TypedDict
+from typing import Annotated, List
+
+import sys
+
+TYPED_DICT_VERSION = (3, 12)
+if sys.version_info < TYPED_DICT_VERSION:
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 from fastapi import Body
 from pymicroservicesbase.sdk.web_api.core_api.base_web_command import (

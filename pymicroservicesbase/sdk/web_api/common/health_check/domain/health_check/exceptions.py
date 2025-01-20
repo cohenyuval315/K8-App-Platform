@@ -1,9 +1,6 @@
-from ...core_api.errors.web_service_error import WebServiceError
-
-
-class HealthCheckDoesNotExistsError(WebServiceError):
+class HealthCheckDoesNotExistsError(Exception):
     pass
 
 
-class HealthCheckAlreadyRunningError(WebServiceError):
+class HealthCheckAlreadyRunningError(Exception):
     pass

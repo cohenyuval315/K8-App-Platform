@@ -7,34 +7,19 @@ from pymicroservicesbase.sdk.web_api.common.health_check.application.commands.ge
 from pymicroservicesbase.sdk.web_api.common.health_check.application.commands.get_health_checks_command import (
     GetHealthChecksCommand,
 )
-from pymicroservicesbase.sdk.web_api.common.health_check.application.responses.health_check_response import (
-    HealthCheckResponse,
-)
-from pymicroservicesbase.sdk.web_api.common.health_check.application.responses.health_checks_response import (
-    HealthChecksResponse,
-)
-from pymicroservicesbase.sdk.web_api.common.health_check.application.responses.health_checks_status_response import (
-    HealthChecksStatusResponse,
-)
 
 
 class HealthCheckService:
     def __init__(self, available_health_checks, all_health_checks):
         pass
 
-    def get_health_check(
-        self, command: GetHealthCheckCommand
-    ) -> HealthCheckResponse:
+    async def get_health_check(self, command: GetHealthCheckCommand):
         pass
 
-    def get_health_checks(
-        self, command: GetHealthChecksCommand
-    ) -> HealthChecksResponse:
+    async def get_health_checks(self, command: GetHealthChecksCommand):
         pass
 
-    def run_health_checks(
-        self, command: RunHealthChecksCommand
-    ) -> HealthChecksStatusResponse:
+    async def run_health_checks(self, command: RunHealthChecksCommand):
         pass
         # health_check_tasks = []
         # health_checks = get_health_checks_from_string(health_checks)

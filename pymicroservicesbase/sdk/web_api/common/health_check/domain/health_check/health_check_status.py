@@ -1,7 +1,6 @@
 from typing import Literal, Any
 
-from ...core_api.base_model import BaseModel
-from fastapi import Path
+from pymicroservicesbase.sdk.web_api.core_api.base_model import BaseModel
 
 
 class HealthCheckStatus(BaseModel):
@@ -9,4 +8,3 @@ class HealthCheckStatus(BaseModel):
     status: Literal["Healthy", "Not Healthy", "InProgress"]
     details: Any | None = None
     error: Any | None = None
-    Path()

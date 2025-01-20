@@ -1,0 +1,1 @@
+{"kind":"FETCH","data":{"headers":{"content-length":"42","content-type":"application/json","date":"Mon, 30 Dec 2024 09:20:33 GMT","server":"uvicorn"},"body":"eyJsb2dpbiI6eyJtZXRob2RzIjpbIlVzZXJuYW1lUGFzc3dvcmQiXX19","status":200,"url":"http://gateway:8000/api/product"},"revalidate":31536000,"tags":[]}

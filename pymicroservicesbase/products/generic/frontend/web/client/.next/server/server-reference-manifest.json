@@ -1,0 +1,39 @@
+{
+  "node": {
+    "00c80b3eebc09f509f2858aecd1953a8569998fe24": {
+      "workers": {
+        "app/login/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fcode%2Fsrc%2Fapp%2Flogin%2Factions.ts%22%2C%5B%5B%2200c80b3eebc09f509f2858aecd1953a8569998fe24%22%2C%22LoginWithTokens%22%5D%2C%5B%2260b7836972a97a24fa3f19d4416522a3feca79dfe2%22%2C%22LoginWithPassword%22%5D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/login/page": "action-browser"
+      }
+    },
+    "60b7836972a97a24fa3f19d4416522a3feca79dfe2": {
+      "workers": {
+        "app/login/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fcode%2Fsrc%2Fapp%2Flogin%2Factions.ts%22%2C%5B%5B%2200c80b3eebc09f509f2858aecd1953a8569998fe24%22%2C%22LoginWithTokens%22%5D%2C%5B%2260b7836972a97a24fa3f19d4416522a3feca79dfe2%22%2C%22LoginWithPassword%22%5D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/login/page": "action-browser"
+      }
+    },
+    "607ab15e3036f65be5c727278824998211d0642c17": {
+      "workers": {
+        "app/signup/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fcode%2Fsrc%2Fapp%2Fsignup%2Factions.ts%22%2C%5B%5B%22607ab15e3036f65be5c727278824998211d0642c17%22%2C%22registerUser%22%5D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/signup/page": "action-browser"
+      }
+    }
+  },
+  "edge": {},
+  "encryptionKey": "wbxr"
+}

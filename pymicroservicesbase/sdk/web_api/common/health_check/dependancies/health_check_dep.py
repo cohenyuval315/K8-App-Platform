@@ -1,6 +1,9 @@
 from typing import Annotated, Dict, Callable
 from fastapi import Depends
-from .health_check_status import HealthCheckStatus
+
+from pymicroservicesbase.sdk.web_api.common.health_check.health_checks.health_check_ping import (
+    HealthCheckStatus,
+)
 
 
 def get_health_check(health_check: str):
