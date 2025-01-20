@@ -23,8 +23,8 @@ repos:
       # - id: check-toml
       - id: check-xml
       - id: check-yaml
-      # - id: debug-statements
-      # - id: destroyed-symlinks
+      - id: debug-statements
+      - id: destroyed-symlinks
       - id: detect-private-key
       - id: end-of-file-fixer
         exclude: ^LICENSE|\.(html|csv|txt|svg|py)$
