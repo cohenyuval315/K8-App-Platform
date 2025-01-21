@@ -40,7 +40,10 @@ class WarningsCollector:
 class WarningsCollectorHandler(logging.Handler):
     """Custom handler to collect warning logs automatically"""
 
+    def __init__(self, level=logging.WARNING):
+        super().__init__(level)
+
     def emit(self, record: logging.LogRecord):
-        if record.levelname == "WARNING":
+        if record.levelname.upper() == "WARNING":
             message = self.format(record)
             WarningsCollector.warn(message)

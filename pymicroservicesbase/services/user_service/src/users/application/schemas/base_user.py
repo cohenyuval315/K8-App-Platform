@@ -9,14 +9,14 @@ from pymicroservicesbase.sdk.web_api.common.types.letters_only_type import (
     LettersOnlyType,
 )
 from pymicroservicesbase.sdk.web_api.common.types.username_type import (
-    UserNameType,
+    UserNameStrType,
 )
 from pymicroservicesbase.sdk.web_api.core_api.base_model import BaseModel
 
 
 class UserSchema(IdentifierSchema, BaseModel):
     email: EmailStr | None = Field(...)
-    username: UserNameType | None = Field(
+    username: UserNameStrType | None = Field(
         None, title="Username", description="User's username"
     )
     first_name: Optional[LettersOnlyType] = Field(

@@ -1,4 +1,3 @@
-import logging
 from contextlib import asynccontextmanager
 
 from pymicroservicesbase.sdk.services.internal.internal_authentication_service import (
@@ -84,7 +83,7 @@ from pymicroservicesbase.shared.constants.headers import (
     VERIFY_SESSION_TOKEN_HEADER_KEY,
     XSS_PROTECTION_HEADER_KEY,
 )
-from pymicroservicesbase.shared.logging import create_logger
+
 
 # from pymicroservicesbase.services.api_gateway_service.src.api_gateway.middlewares.request_middleware import RequestMiddleware
 
@@ -96,6 +95,8 @@ from pymicroservicesbase.services.api_gateway_service.src.errors.api_gateway_web
     APIGatewayWebServiceErrorHandler,
 )
 
+from pymicroservicesbase.services.api_gateway_service.logger import logger
+
 
 @asynccontextmanager
 async def lifespan(app: WebService):
@@ -105,41 +106,6 @@ async def lifespan(app: WebService):
 
 
 def create_api_gateway_web_service() -> WebServiceContainer:
-    logger = create_logger(
-        level=logging.DEBUG,
-        loggers_levels={
-            "uvicorn": {
-                "handlers": ["default", "file_handler"],
-                "level": logging.ERROR,
-                "propagate": False,
-            },
-            "uvicorn.access": {
-                "handlers": ["stream_handler", "file_handler"],
-                "level": logging.ERROR,
-                "propagate": False,
-            },
-            "uvicorn.error": {
-                "handlers": ["stream_handler", "file_handler"],
-                "level": logging.ERROR,
-                "propagate": False,
-            },
-            "uvicorn.asgi": {
-                "handlers": ["stream_handler", "file_handler"],
-                "level": logging.ERROR,
-                "propagate": False,
-            },
-            "httpx": {
-                "handlers": ["default"],
-                "level": logging.ERROR,
-                "propagate": False,
-            },
-            "httpcore": {
-                "handlers": ["default"],
-                "level": logging.ERROR,
-                "propagate": False,
-            },
-        },
-    )
     web_service_logger = WebServiceLogger(logger=logger)
 
     auth_client = InternalAuthenticationServiceClient("APIGateway")

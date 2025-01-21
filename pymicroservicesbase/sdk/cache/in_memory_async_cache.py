@@ -347,7 +347,7 @@ class InMemoryAsyncCache(AbstractAsyncCache):
     ) -> Optional[dict]:
         async with self._lock:
             entry = self._store.get(key, None)
-            if entry is not None and isinstance(entry, dict):
+            if entry is not None and isinstance(entry, dict) and entry:
                 return entry
 
     async def delete_flat_mapping(

@@ -1,0 +1,25 @@
+{
+  "layout":{
+    "header":{
+      "searchBar":false,
+      "login":{
+
+      },
+      "navMenu":{
+
+      }
+    },
+    "body":{
+
+    },
+    "footer":{
+      "showNavMenu":{
+
+      },
+      "links":{
+
+      }
+    }
+
+  }
+}

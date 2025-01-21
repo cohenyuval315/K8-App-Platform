@@ -1,9 +1,7 @@
 from fastapi import Response
-from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.get_product_authentication_data_command import (
-    GetProductAuthenticationDataCommand,
-)
-from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.get_user_authentication_data_command import (
-    GetUserAuthenticationDataCommand,
+
+from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.get_user_identity_command import (
+    GetUserIdentityCommand,
 )
 from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.login.login_command import (
     LoginCommand,
@@ -73,8 +71,7 @@ class AuthenticationController:
         return res
 
     async def confirm_registration(self):
-        token = ""
-        return await self.authentication_service.confirm_registration(token)
+        pass
 
     # async def authenticate(self, command: AuthenticationCommand) -> AuthenticationResponseModel:
     #     return await self.authentication_service.authenticate(command)
@@ -82,21 +79,13 @@ class AuthenticationController:
     async def whoami(self, command: WhoAmICommand):
         return await self.authentication_service.whoami(command)
 
-    # async def account_recovery(self, command:AccountRecoveryCommand) -> AccountRecoveryResponseModel:
-    #     return await self.authentication_service.account_recovery(command)
+    async def account_recovery(self, command):
+        # return await self.authentication_service.account_recovery(command)
+        pass
 
     async def get_user_authentication_data(
-        self, command: GetUserAuthenticationDataCommand
+        self, command: GetUserIdentityCommand
     ):
         return await self.authentication_service.get_user_authentication_data(
             command
-        )
-
-    async def get_product_authentication_data(
-        self, command: GetProductAuthenticationDataCommand
-    ):
-        return (
-            await self.authentication_service.get_product_authentication_data(
-                command
-            )
         )

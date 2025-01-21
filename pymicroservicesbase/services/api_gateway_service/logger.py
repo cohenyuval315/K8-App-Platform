@@ -1,8 +1,8 @@
 import logging
 
-from pymicroservicesbase.shared.logging.create_logger import create_logger
+from pymicroservicesbase.shared.logging import get_logger
 
-logger = create_logger(
+logger = get_logger(
     name="pymicroservicesbase.api_gateway",
     level=logging.DEBUG,
     propagate=False,

@@ -36,14 +36,8 @@ class AbstractLogger(ABC):
     def verbose(self, level, msg, stack_level, *args, **kwargs):
         raise NotImplementedError
 
-    # @abstractmethod
-    # def fatal(self, msg, *args, **kwargs):
-    #     pass
+    def fatal(self, msg, *args, **kwargs):
+        pass
 
-    # @abstractmethod
-    # def warn(self, msg, *args, **kwargs):
-    #     pass
-
-    # @abstractmethod
-    # def exception(self, exception,*args, **kwargs):
-    #     pass
+    def exception(self, exception, *args, **kwargs):
+        pass

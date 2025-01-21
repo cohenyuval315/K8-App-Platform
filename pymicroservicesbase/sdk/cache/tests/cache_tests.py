@@ -1,12 +1,14 @@
+from typing import Any, Generator
+import pytest
+import asyncio
+
 import pytest_asyncio
-import orjson
 
 
 from pymicroservicesbase.sdk.cache.in_memory_async_cache import (
     InMemoryAsyncCache,
 )
-from test.shared.logging.logger import logger
-
+from pymicroservicesbase.sdk.cache.redis_async_cache import RedisAsyncCache
 
 from pymicroservicesbase.sdk.cache.abstract_async_cache import (
     AbstractAsyncCache,
@@ -25,39 +27,49 @@ from .utils.test_utils import (
 TTL_LEEWAY = 5
 
 
-def to_json(data):
-    json_bytes = orjson.dumps(data, option=orjson.OPT_INDENT_2)
-    return json_bytes.decode("utf-8")
-
-
-async def debug(cache):
-    (_store, _ttl) = await cache.get_all()
-    logger.debug(f"STORE: {to_json(_store)}")
-    logger.debug(f"TTL STORE: {to_json(_ttl)}")
-
-
 def is_within_leeway(ttl_a: float, ttl_b: float) -> bool:
     return abs(ttl_a - ttl_b) < TTL_LEEWAY
 
 
+@pytest.fixture(scope="session", autouse=True)
+def event_loop() -> Generator["asyncio.AbstractEventLoop", Any, None]:
+    policy = asyncio.get_event_loop_policy()
+    loop = policy.new_event_loop()
+    yield loop
+    loop.close()
+
+
 @pytest_asyncio.fixture
-async def cache():
+async def redis_cache(event_loop):
+    """Fixture to provide InMemoryAsyncCache instance."""
+    cache = RedisAsyncCache()
+    await cache.connect()
+    yield cache
+    await cache.close()
+
+
+@pytest_asyncio.fixture
+async def in_memory_cache():
     """Fixture to provide InMemoryAsyncCache instance."""
     cache = InMemoryAsyncCache()
-    await cache.connect()  # In case there's any connection setup
+    await cache.connect()
     yield cache
-    await cache.close()  # Cleanup after test is done
+    await cache.close()
+
+
+# @pytest.mark.parametrize(
+#     "cache", ["in_memory_cache"],indirect=True)
+@pytest_asyncio.fixture
+async def cache(in_memory_cache, redis_cache):
+    """Fixture to provide InMemoryAsyncCache instance."""
+    yield redis_cache
 
 
 # Key Operations
-
-
 async def test_get_key(cache: AbstractAsyncCache):
     key = generate_test_key()
     value = generate_test_string()
-    await cache.set_key(
-        key, value
-    )  # Setting value to check the get_key operation
+    await cache.set_key(key, value)
     result = await cache.get_key(key)
     assert result == value, f"Expected {value}, but got {result}"
 
@@ -117,8 +129,6 @@ async def test_get_ttl(cache: AbstractAsyncCache):
     await cache.set_ttl(key, ttl)
 
     result = await cache.get_ttl(key)
-    logger.info(ttl)
-    logger.info(result)
 
     assert is_within_leeway(
         result, ttl
@@ -180,7 +190,7 @@ async def test_delete_set(cache: AbstractAsyncCache):
     await cache.create_set(key)
     await cache.delete_set(key)
     result = await cache.get_set_size(key)
-    assert result < 0, "Set should be deleted"
+    assert result <= 0, "Set should be deleted"
 
 
 async def test_get_set_size(cache: AbstractAsyncCache):

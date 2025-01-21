@@ -1,7 +1,8 @@
-from .create_logger import create_logger
-from .root_logger import logger
+from .logger_factory import get_logger
 import logging as lg
 
+
+ROOT = "pymicroservicesbase"
 
 DEBUG = lg.DEBUG
 INFO = lg.INFO
@@ -11,33 +12,37 @@ CRITICAL = lg.CRITICAL
 ERROR = lg.ERROR
 FATAL = lg.FATAL
 NOTSET = lg.NOTSET
-TRACE = 5
 
+TRACE = 5
 lg.addLevelName(TRACE, "TRACE")
 
+levels = {
+    "debug": DEBUG,
+    "info": INFO,
+    "warn": WARN,
+    "warning": WARNING,
+    "critical": CRITICAL,
+    "error": ERROR,
+    "fatal": FATAL,
+    "notset": NOTSET,
+    "trace": TRACE,
+}
 
-# loggers = {
-#     "sqlalchemy",
-#     "sqlalchemy.engine",
-#     "sqlalchemy.pool",
-#     "sqlalchemy.dialects",
-#     "sqlalchemy.orm",
-#     "faker"
-# "uvicorn",
-# "uvicorn.access",
-# "uvicorn.error",
-# "uvicorn.asgi",
-# }
+levels_nums = list(levels.values())
 
 
-# import sentry_sdk
+def normalize_log_level(log_level: int | str):
+    try:
+        if isinstance(log_level, int):
+            if log_level not in levels_nums:
+                raise ValueError(f"invalid log level {log_level}")
+            return log_level
+        elif isinstance(log_level, str):
+            return levels.get(log_level.lower())
+    except KeyError:
+        raise ValueError(f"invalid log level {log_level}")
 
-# sentry_sdk.init(
-#     "https://<key>@sentry.io/<project>",
 
-#     # Set traces_sample_rate to 1.0 to capture 100%
-#     # of transactions for Tracing.
-#     # We recommend adjusting this value in production.
-#     enable_tracing=True,
-#     traces_sample_rate=1.0,
-# )
+lg.basicConfig(filename="logging.conf", filemode="w")
+
+logger = get_logger(name=ROOT, level=lg.DEBUG, propagate=True)

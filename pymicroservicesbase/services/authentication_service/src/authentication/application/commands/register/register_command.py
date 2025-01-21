@@ -1,6 +1,6 @@
 from pydantic import ConfigDict, EmailStr
 from typing import Annotated
-from fastapi import Body, Depends, Response, Request
+from fastapi import Body, Depends, Query, Response, Request
 
 from pymicroservicesbase.sdk.web_api.core_api.base_web_command import (
     BaseWebCommand,
@@ -20,10 +20,10 @@ class RegisterCommand(BaseWebCommand):
 async def get_register_command(
     response: Response,
     request: Request,
-    username: str = Body(default=""),
-    password: str = Body(default=""),
-    email: EmailStr = Body(default=""),
-    register_method: str = "instant",
+    username: str = Body(default="test"),
+    password: str = Body(default="test"),
+    email: EmailStr = Body(default="test@test.com"),
+    register_method: str = Query(default="instant"),
 ) -> RegisterCommand:
     return RegisterCommand(
         request=request,

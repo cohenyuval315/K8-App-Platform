@@ -4,6 +4,7 @@ minimum_pre_commit_version: '0'
 fail_fast: false
 default_language_version:
   python: python3.11
+
 repos:
 
 
@@ -13,40 +14,55 @@ repos:
     rev: v5.0.0
     hooks:
       - id: check-yaml
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
-      - id: check-added-large-files
-      - id: check-case-conflict
-      - id: check-docstring-first
-      - id: check-shebang-scripts-are-executable
-      - id: check-merge-conflict
-      - id: check-json
-      - id: check-toml
-      - id: check-xml
-      - id: check-yaml
-      - id: debug-statements
-      - id: destroyed-symlinks
-      - id: detect-private-key
-      - id: end-of-file-fixer
-        exclude: ^LICENSE|\.(html|csv|txt|svg|py)$
-      - id: pretty-format-json
-        args: ["--autofix", "--no-ensure-ascii", "--no-sort-keys"]
-      - id: requirements-txt-fixer
-      - id: trailing-whitespace
-        args: [--markdown-linebreak-ext=md]
-        exclude: \.(html|svg)$
+      # - id: end-of-file-fixer
+      # - id: trailing-whitespace
+# <<<<<<< Updated upstream
+#       - id: check-added-large-files
+#       - id: check-case-conflict
+#       - id: check-docstring-first
+#       - id: check-shebang-scripts-are-executable
+#       - id: check-merge-conflict
+#       - id: check-json
+#       - id: check-toml
+#       - id: check-xml
+#       - id: check-yaml
+#       - id: debug-statements
+#       - id: destroyed-symlinks
+#       - id: detect-private-key
+# =======
+      # # - id: check-added-large-files
+      # - id: check-case-conflict
+      # # - id: check-docstring-first
+      # - id: check-shebang-scripts-are-executable
+      # - id: check-merge-conflict
+      # - id: check-json
+      # - id: check-toml
+      # - id: check-xml
+      # - id: check-yaml
+      # - id: debug-statements
+      # - id: destroyed-symlinks
+      # - id: detect-private-key
+#       - id: end-of-file-fixer
+#         exclude: ^LICENSE|\.(html|csv|txt|svg|py)$
+#       - id: pretty-format-json
+#         args: ["--autofix", "--no-ensure-ascii", "--no-sort-keys"]
+#       - id: requirements-txt-fixer
+#       # - id: requirements-txt-fixer
+#       - id: trailing-whitespace
+#         args: [--markdown-linebreak-ext=md]
+#         exclude: \.(html|svg)$
 
 
 # ----------------------- BLACK -----------------------
 
-  - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 24.8.0
-    hooks:
-      - id: black-jupyter
-        files: \.ipynb$
-      - id: black
-        files: \.py$
-        language_version: python3.11
+  # - repo: https://github.com/psf/black-pre-commit-mirror
+  #   rev: 24.8.0
+  #   hooks:
+  #     - id: black-jupyter
+  #       files: \.ipynb$
+  #     - id: black
+  #       files: \.py$
+  #       language_version: python3.11
 
 # ----------------------- RUFF -----------------------
 
@@ -59,6 +75,20 @@ repos:
   #     files: \.py$
     # - id: ruff-format
     #   files: \.py$
+
+# ----------------------- RUFF -----------------------
+
+  # - repo: https://github.com/astral-sh/ruff-pre-commit
+  #   rev: v0.9.1
+  #   hooks:
+  #   - id: ruff
+  #     language_version: python3
+  #     args: [--fix, --exit-non-zero-on-fix, --show-fixes]
+  #     files: \.py$
+  #   - id: ruff-format
+  #     args: [--preview]
+  #     files: \.py$
+
 
 # ----------------------- AUTOPEP8 -----------------------
 
@@ -79,10 +109,18 @@ repos:
 
 
 # ----------------------- PYUPDATE -----------------------
+
   # - repo: https://github.com/asottile/pyupgrade
   #   rev: v3.19.1
   #   hooks:
   #   -   id: pyupgrade
+  #       files: \.py$
+
+  # - repo: https://github.com/asottile/pyupgrade
+  #   rev: v3.19.1
+  #   hooks:
+  #   -   id: pyupgrade
+  #       args: [--py311-plus]
   #       files: \.py$
 
 # ----------------------- CREOSOTE -----------------------

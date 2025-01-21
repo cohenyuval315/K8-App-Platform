@@ -255,6 +255,7 @@ class JWTConfig(BaseModel):
 
 
 class JWTTokenFactory(BaseTokenFactory):
+    token_type = "Bearer"
     JTI_ID_LENGTH = 36
 
     def _verify_token(self, token):

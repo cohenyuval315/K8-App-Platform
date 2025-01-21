@@ -39,6 +39,7 @@ dependencies=[
   "chardet",
   "anyio",
   "toml",
+  "python-json-logger",
   "tomli",
   "types-toml",
   "PyYAML",
@@ -152,7 +153,7 @@ prod = [
 worker = [
   "celery",
   "celery[redis]",
-  "redis",                 # offical Redis python distribution  - has asyncio and cluster support since certain version
+  "redis",                 #  Redis python distribution  - has asyncio and cluster support since certain version
 ]
 
 
@@ -349,9 +350,20 @@ markers = [
     "serial",
 ]
 
-log_level="DEBUG"
+log_level="INFO"
 
 log_cli = true
 log_cli_level = "INFO"
 log_cli_format = "%(name)s  %(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
 log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+
+
+[tool.locust]
+headless = true
+# master = true
+expect-workers = 1
+host = "http://127.0.0.1:4999"
+users = 1000
+spawn-rate = 100
+html = "./reports/load.html"
+run-time = "2m"

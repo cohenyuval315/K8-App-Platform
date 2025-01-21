@@ -2,7 +2,7 @@ from typing import Annotated
 
 from pydantic import StringConstraints
 
-PassWordStr = Annotated[
+PassWordStrType = Annotated[
     str,
     StringConstraints(
         strip_whitespace=True,

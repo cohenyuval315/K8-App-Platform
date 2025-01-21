@@ -5,6 +5,7 @@ from starlette.types import ASGIApp, Scope, Receive, Send, Message
 from pymicroservicesbase.sdk.web_api.core_api.logging.web_service_logger import (
     WebServiceLogger,
 )
+import logging
 import aiofiles
 
 # async def get_response(scope, receive, send) -> Response:
@@ -55,7 +56,9 @@ import aiofiles
 
 
 class LoggingMiddleware:
-    def __init__(self, app: ASGIApp, logger: WebServiceLogger) -> None:
+    def __init__(
+        self, app: ASGIApp, logger: WebServiceLogger | logging.Logger
+    ) -> None:
         self.app = app
         self.logger = logger
         self.request_body_buffer = BytesIO()

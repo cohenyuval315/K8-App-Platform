@@ -5,6 +5,8 @@ from pymicroservicesbase.utils.id.generate_id import generate_id
 
 
 class UUIDTokenFactory(BaseTokenFactory):
+    token_type = "uuid"
+
     def _verify_token(
         self,
         token: str,

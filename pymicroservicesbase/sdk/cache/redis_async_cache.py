@@ -20,8 +20,8 @@ class RedisAsyncCache(AbstractAsyncCache):
         """
         try:
             return self._client
-        except Exception:
-            raise
+        except Exception as e:
+            raise e
         finally:
             pass
 
@@ -34,11 +34,11 @@ class RedisAsyncCache(AbstractAsyncCache):
 
     async def connect(self, *args: Any, **kwargs: Any) -> Any:
         """cleanup"""
-        pass
+        return await self.client.ping()
 
     async def close(self, *args: Any, **kwargs: Any) -> Any:
         """cleanup"""
-        await self.client.aclose()
+        return await self.client.aclose()
 
     # Key Operations
     async def get_key(self, key: str, *args: Any, **kwargs: Any) -> Any:
@@ -65,10 +65,13 @@ class RedisAsyncCache(AbstractAsyncCache):
     async def key_exists(
         self, key: str, *args: Any, **kwargs: Any
     ) -> bool | Any:
-        return await self._client.exists(key)
+        return await self._client.exists(key) == 1
 
     async def get_ttl(self, key: str, *args: Any, **kwargs: Any) -> int | Any:
-        return await self._client.ttl(key)
+        ttl = await self._client.ttl(key)
+        if ttl == -1:
+            return None
+        return ttl
 
     async def set_ttl(
         self, key: str, ttl: int, *args: Any, **kwargs: Any
@@ -151,9 +154,10 @@ class RedisAsyncCache(AbstractAsyncCache):
     async def create_set(
         self, key: str, *args: Any, **kwargs: Any
     ) -> int | Any:
-        result = self._client.sadd(key)
+        result = self._client.sadd(key, *["default"])
         if isinstance(result, Awaitable):
             result = await result
+        await self.remove_from_set(key, "default")
         return result
 
     async def add_to_set(
@@ -235,7 +239,7 @@ class RedisAsyncCache(AbstractAsyncCache):
     async def set_flat_mapping(
         self, key: str, mapping: dict, *args: Any, **kwargs: Any
     ) -> Any | None:
-        result = self._client.hmset(key, mapping)
+        result = self._client.hset(key, None, None, mapping)
         if isinstance(result, Awaitable):
             result = await result
         return result
@@ -275,6 +279,8 @@ class RedisAsyncCache(AbstractAsyncCache):
         result = self._client.hgetall(key)
         if isinstance(result, Awaitable):
             result = await result
+        if not result:
+            return None
         return result
 
     async def delete_flat_mapping(

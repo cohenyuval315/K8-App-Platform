@@ -51,6 +51,3 @@ async def get_refresh_command(
 
 
 RefreshCommandDep = Annotated[RefreshCommand, Depends(get_refresh_command)]
-
-
-RefreshCommandDep = Annotated[RefreshCommand, Depends(get_refresh_command)]

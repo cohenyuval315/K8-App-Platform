@@ -33,6 +33,8 @@ class TOTPConfig(BaseModel):
 
 
 class TOTPTokenFactory(BaseTokenFactory):
+    token_type = "totp"
+
     def _get_totp(self) -> pyotp.TOTP:
         totp = pyotp.TOTP(
             s=getattr(self, "s"),

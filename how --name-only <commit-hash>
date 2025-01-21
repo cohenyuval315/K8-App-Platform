@@ -1,0 +1,1646 @@
+[1mdiff --git a/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/authentication_service.py b/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/authentication_service.py[m
+[1mindex 28daa25..db1c302 100644[m
+[1m--- a/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/authentication_service.py[m
+[1m+++ b/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/authentication_service.py[m
+[36m@@ -1,29 +1,6 @@[m
+[31m-import re[m
+[31m-[m
+[31m-from cryptography.fernet import Fernet[m
+[31m-from fastapi import Request, Response[m
+[31m-from fastapi.responses import JSONResponse[m
+[31m-from pydantic import ValidationError[m
+[31m-[m
+[31m-from pymicroservicesbase.sdk.services.internal.internal_user_service_client import ([m
+[31m-    InternalUserServiceClient,[m
+[31m-)[m
+[31m-from pymicroservicesbase.sdk.web_api.core_api.errors.web_service_error import ([m
+[31m-    WebServiceError,[m
+[31m-)[m
+[31m-from pymicroservicesbase.services.authentication_service.logger import logger[m
+[31m-[m
+[31m-# from pymicroservicesbase.services.authentication_service.src.authentication.application.responses.authentication_responses import AuthenticationResponseModel[m
+[31m-from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.get_product_authentication_data_command import ([m
+[31m-    GetProductAuthenticationDataCommand,[m
+[31m-)[m
+[31m-from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.get_user_authentication_data_command import ([m
+[31m-    GetUserAuthenticationDataCommand,[m
+[32m+[m[32mfrom pymicroservicesbase.services.authentication_service.src.authentication.application.commands.get_user_identity_command import ([m
+[32m+[m[32m    GetUserIdentityCommand,[m
+ )[m
+[31m-[m
+[31m-# from pymicroservicesbase.services.authentication_service.src.authentication.application.responses.account_recovery_responses import AccountRecoveryResponseModel[m
+[31m-# from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.account_recovery.account_recovery_command import AccountRecoveryCommand[m
+[31m-# from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.authentication_command.authentication_command import AuthenticationCommand[m
+ from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.login.login_command import ([m
+     LoginCommand,[m
+ )[m
+[36m@@ -42,1138 +19,63 @@[m [mfrom pymicroservicesbase.services.authentication_service.src.authentication.appl[m
+ from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.whoami_command import ([m
+     WhoAmICommand,[m
+ )[m
+[31m-from pymicroservicesbase.services.authentication_service.src.authentication.application.responses.login_responses import ([m
+[31m-    LoginResponseModel,[m
+[31m-)[m
+[31m-from pymicroservicesbase.services.authentication_service.src.authentication.application.responses.logout_responses import ([m
+[31m-    LogoutResponseModel,[m
+[31m-)[m
+[31m-from pymicroservicesbase.services.authentication_service.src.authentication.application.responses.register_responses import ([m
+[31m-    RegisterResponseModel,[m
+[31m-)[m
+[31m-from pymicroservicesbase.services.authentication_service.src.authentication.domain.services.providers.auth_provider_service import ([m
+[31m-    AuthProviderService,[m
+[31m-)[m
+[31m-from pymicroservicesbase.services.authentication_service.src.authentication.domain.services.sessions.user_active_session_service import ([m
+[31m-    UserActiveSessionService,  # type: ignore[m
+[31m-)[m
+[31m-from pymicroservicesbase.services.authentication_service.src.authentication.domain.services.sessions.user_session import ([m
+[31m-    UserSessionData,[m
+[31m-)[m
+[31m-from pymicroservicesbase.services.authentication_service.src.authentication.domain.services.sessions.user_session_service import ([m
+[31m-    UserSessionService,[m
+[31m-)[m
+[31m-from pymicroservicesbase.services.authentication_service.src.authentication.domain.services.tokens.payloads import ([m
+[31m-    LoginPayload,  # type: ignore[m
+[31m-)[m
+[31m-from pymicroservicesbase.services.authentication_service.src.authentication.domain.services.tokens.payloads import ([m
+[31m-    SessionPayload,  # type: ignore[m
+[31m-)[m
+[31m-from pymicroservicesbase.services.authentication_service.src.authentication.domain.services.tokens.payloads import ([m
+[31m-    AccessPayload,[m
+[31m-    AccessTokenPayload,[m
+[31m-    ProductPayload,[m
+[31m-    RefreshTokenPayload,[m
+[31m-    SessionTokenPayload,[m
+[31m-    UserPayload,[m
+[32m+[m
+[32m+[m[32mfrom pymicroservicesbase.services.authentication_service.src.authentication.domain.services.identity_service.identity_service import ([m
+[32m+[m[32m    IdentityService,[m
+ )[m
+[31m-from pymicroservicesbase.services.authentication_service.src.authentication.domain.services.tokens.tokens_service import ([m
+[31m-    TokenService,[m
+[32m+[m[32mfrom pymicroservicesbase.services.authentication_service.src.authentication.domain.services.login_service.login_service import ([m
+[32m+[m[32m    LoginService,[m
+ )[m
+[31m-from pymicroservicesbase.services.authentication_service.src.cookies.cookies_manager import ([m
+[31m-    CookiesManager,[m
+[32m+[m[32mfrom pymicroservicesbase.services.authentication_service.src.authentication.domain.services.logout_service.logout_service import ([m
+[32m+[m[32m    LogoutService,[m
+ )[m
+[31m-[m
+[31m-from pymicroservicesbase.utils.security.password import ([m
+[31m-    verify_password,[m
+[32m+[m[32mfrom pymicroservicesbase.services.authentication_service.src.authentication.domain.services.refresh_service.refresh_service import ([m
+[32m+[m[32m    RefreshService,[m
+ )[m
+[31m-from pymicroservicesbase.shared.constants.headers import ([m
+[31m-    CSRF_TOKEN_HEADER_KEY,[m
+[32m+[m[32mfrom pymicroservicesbase.services.authentication_service.src.authentication.domain.services.signup_service.signup_service import ([m
+[32m+[m[32m    SignupService,[m
+ )[m
+[31m-from pymicroservicesbase.utils.datetime_utils.conversion import ([m
+[31m-    datetime_to_string,[m
+[32m+[m[32mfrom pymicroservicesbase.services.authentication_service.src.authentication.domain.services.verify_service.verify_service import ([m
+[32m+[m[32m    VerifyService,[m
+ )[m
+[31m-from pymicroservicesbase.utils.datetime_utils.datetime import utcnow[m
+[31m-from pymicroservicesbase.utils.tokens.token_key_type import TokenKeyType[m
+[31m-[m
+[31m-# from packages.python.project_core.project_web_api.src.web_api.dependancies.product import ProductRegister[m
+[31m-# from packages.python.project_core.project_web_api.src.web_api.dependancies.service import ServiceRegister[m
+[31m-# from services.user_microservice.user_microservice.users.utils.security import[m
+[31m-[m
+[31m-# LoginMethodType,[m
+[31m-# MobileLoginMethod,[m
+[31m-# TokenLoginMethod,[m
+[31m-# OAuthLoginMethod[m
+ [m
+ [m
+ class AuthenticationService:[m
+     def __init__([m
+         self,[m
+[31m-        user_service: InternalUserServiceClient,[m
+[31m-        user_session_service: UserSessionService,[m
+[31m-        user_active_session_service: UserActiveSessionService,[m
+[31m-        cookies_manager: CookiesManager,[m
+[31m-        token_service: TokenService,[m
+[31m-        auth_provider_service: AuthProviderService,[m
+[32m+[m[32m        login_service: LoginService,[m
+[32m+[m[32m        signup_service: SignupService,[m
+[32m+[m[32m        refresh_service: RefreshService,[m
+[32m+[m[32m        verify_service: VerifyService,[m
+[32m+[m[32m        logout_service: LogoutService,[m
+[32m+[m[32m        identity_service: IdentityService,[m
+     ):[m
+[31m-        self.user_service = user_service[m
+[31m-        self.session_service = user_session_service[m
+[31m-        self.cookies_manager = cookies_manager[m
+[31m-        self.auth_provider_service = auth_provider_service[m
+[31m-        self.token_service = token_service[m
+[31m-        self.user_active_session_service = user_active_session_service[m
+[31m-        self.internal_service_access = {[m
+[31m-            "client_id": "auth_client_id",[m
+[31m-            "client_secret": "auth_client_id",[m
+[31m-            "scope": "",[m
+[31m-        }[m
+[31m-        self.FERNET_SECRET_KEY = Fernet.generate_key()[m
+[31m-        self.cipher_suite = Fernet(self.FERNET_SECRET_KEY)[m
+[31m-[m
+[31m-        self.refresh_token_expire = 24 * 60 * 60[m
+[31m-        self.access_token_expire = 20 * 60[m
+[31m-        self.session_token_expire = 10 * 60[m
+[31m-[m
+[31m-        self.session_id_token_expire = 5 * 60[m
+[31m-        self.csrf_token_expire = 5 * 60[m
+[31m-        self.session_ttl = 5 * 60[m
+[31m-[m
+[31m-    def get_user_sessions_key(self, user_id: str) -> str:[m
+[31m-        return f"{user_id}:sessions"[m
+[31m-[m
+[31m-    def get_product_sessions_key(self, product_id: str) -> str:[m
+[31m-        return f"{product_id}:sessions"[m
+[31m-[m
+[31m-    async def register_user([m
+[31m-        self, command: RegisterCommand[m
+[31m-    ) -> RegisterResponseModel:[m
+[31m-        params = {[m
+[31m-            "view_type": "admin",[m
+[31m-        }[m
+[31m-        if len(command.username) == 0:[m
+[31m-            command.username = command.email[m
+[31m-        register_data = command.model_dump([m
+[31m-            exclude=["response", "request", "register_method"][m
+[31m-        )  # type: ignore[m
+[31m-[m
+[31m-        logger.info(" ATLEAST REACHED HERE")[m
+[31m-        response = await self.user_service.create_user([m
+[31m-            data=register_data, params=params[m
+[31m-        )[m
+[31m-        logger.info(response)[m
+[31m-        result = response.json()[m
+[31m-        logger.info(result)[m
+[31m-        try:[m
+[31m-            response.raise_for_status()[m
+[31m-        except Exception as e:[m
+[31m-            logger.error(e)[m
+[31m-            raise WebServiceError([m
+[31m-                error_code=response.status_code,[m
+[31m-                error=e,[m
+[31m-                errors=WebServiceError.unpack(result),[m
+[31m-            ) from e[m
+[31m-        else:[m
+[31m-            data = result["data"][m
+[31m-            logger.debug(data)[m
+[31m-[m
+[31m-        return RegisterResponseModel(message="User successfuly registered")[m
+[31m-[m
+[31m-    async def register([m
+[31m-        self, command: RegisterCommand[m
+[31m-    ) -> RegisterResponseModel:[m
+[31m-        try:[m
+[31m-            register_method_handlers = {[m
+[31m-                "instant": self.register_user,[m
+[31m-            }[m
+[31m-            handler = register_method_handlers[command.register_method][m
+[31m-            response = await handler(command=command)[m
+[31m-            return response[m
+[31m-        except KeyError as e:[m
+[31m-            logger.error(e, exc_info=True)[m
+[31m-            raise WebServiceError([m
+[31m-                title="invalid register method",[m
+[31m-                description=f"invalid register method = {command.register_method}",[m
+[31m-                error_severity="NONE_OPERATIONAL",[m
+[31m-                error_code=400,[m
+[31m-            )[m
+[31m-[m
+[31m-    async def _login_password(self, command: LoginCommand) -> UserPayload:[m
+[31m-        body = await command.request.json()[m
+[31m-        request_body = dict(body)  # TODO change to pydantic validate model[m
+[31m-        try:[m
+[31m-            password = request_body["password"][m
+[31m-            identifier = request_body["identifier"][m
+[31m-        except KeyError:[m
+[31m-            raise WebServiceError([m
+[31m-                title=f"invalid request body for login method {command.login_method}",[m
+[31m-                error_code=400,[m
+[31m-            )[m
+[31m-[m
+[31m-        field = None[m
+[31m-        email_pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"[m
+[31m-        username_pattern = r"^[\w]+$"[m
+[31m-[m
+[31m-        if re.match(email_pattern, identifier):[m
+[31m-            field = "email"[m
+[31m-        elif re.match(username_pattern, identifier):[m
+[31m-            field = "username"[m
+[31m-[m
+[31m-        if field is None:[m
+[31m-            raise WebServiceError([m
+[31m-                title=f"invalid identifer for login method {command.login_method}",[m
+[31m-                error_code=400,[m
+[31m-            )[m
+[31m-[m
+[31m-        response = await self.user_service.get_users([m
+[31m-            filters=[{"field": field, "value": identifier, "operator": "eq"}],[m
+[31m-        )[m
+[31m-[m
+[31m-        if not response.is_success:[m
+[31m-            raise WebServiceError(  # TODO delete this and use default web client with custom exception[m
+[31m-                title="user service response gave unexpected response",[m
+[31m-                description="user service response was not successful, 'get' should always be successful in get many users context",[m
+[31m-                error_code=500,[m
+[31m-            )[m
+[31m-[m
+[31m-        try:[m
+[31m-            res = response.json()[m
+[31m-            data = res["data"][m
+[31m-            if len(data) != 1:[m
+[31m-                raise WebServiceError([m
+[31m-                    error_message=f"{field} '{identifier}' does not exists",[m
+[31m-                    is_public=True,[m
+[31m-                    error_code=401,[m
+[31m-                )[m
+[31m-            user = data[0][m
+[31m-            hashed_password = user["hashed_password"][m
+[31m-        except (KeyError, IndexError) as e:[m
+[31m-            logger.error(e, exc_info=True)[m
+[31m-            raise WebServiceError([m
+[31m-                title="failed to parse user repsonse",[m
+[31m-                description="failed to parse user repsonse",[m
+[31m-                error_code=500,[m
+[31m-            )[m
+[31m-[m
+[31m-        is_success = verify_password(password, hashed_password)[m
+[31m-        if not is_success:[m
+[31m-            raise WebServiceError([m
+[31m-                error_message="Invalid password",[m
+[31m-                error_code=401,[m
+[31m-                is_public=True,[m
+[31m-            )[m
+[31m-        try:[m
+[31m-            user_payload = UserPayload.model_validate(user)[m
+[31m-            return user_payload[m
+[31m-        except ValidationError:[m
+[31m-            raise WebServiceError([m
+[31m-                title="user payload failed to parse user", error_code=500[m
+[31m-            )[m
+[31m-[m
+[31m-    async def login_password(self, command: LoginCommand):[m
+[31m-        user_payload = await self._login_password(command)[m
+[31m-        logger.debug(user_payload)[m
+[31m-[m
+[31m-        session_id_token = await self.token_service.generate_session_id_token()[m
+[31m-        csrf_token = await self.token_service.generate_csrf_token()[m
+[31m-[m
+[31m-        access_payload = AccessPayload.model_validate([m
+[31m-            self.internal_service_access[m
+[31m-        )[m
+[31m-        product_payload = ProductPayload(product_id=command.product_id)[m
+[31m-        login_payload = LoginPayload([m
+[31m-            login_method="password",[m
+[31m-            login_provider=None,[m
+[31m-        )[m
+[31m-        session_payload = SessionPayload(session_id=session_id_token)[m
+[31m-[m
+[31m-        await self.user_active_session_service.create_user_session([m
+[31m-            session_key=session_id_token,[m
+[31m-            user_set_key=self.get_user_sessions_key(user_payload.user_id),[m
+[31m-            value=UserSessionData([m
+[31m-                last_activity=datetime_to_string(utcnow()),[m
+[31m-                user_id=user_payload.user_id,[m
+[31m-                product_id=command.product_id,[m
+[31m-                extend_count=0,[m
+[31m-                session_id=session_id_token,[m
+[31m-                user_email=user_payload.user_email,[m
+[31m-                user_username=user_payload.user_username,[m
+[31m-                # expire_at=self.[m
+[31m-                # ttl=self.session_ttl[m
+[31m-            ).model_dump(),[m
+[31m-            expire_at=self.session_ttl,[m
+[31m-            product_set_key=self.get_product_sessions_key(command.product_id),[m
+[31m-        )[m
+[31m-[m
+[31m-        access_token = await self.token_service.generate_access_token([m
+[31m-            AccessTokenPayload([m
+[31m-                access=access_payload,[m
+[31m-                product=product_payload,[m
+[31m-                user=user_payload,[m
+[31m-            ),[m
+[31m-            self.access_token_expire,[m
+[31m-        )[m
+[31m-[m
+[31m-        refresh_token = await self.token_service.generate_refresh_token([m
+[31m-            RefreshTokenPayload([m
+[31m-                product=product_payload, user=user_payload, login=login_payload[m
+[31m-            ),[m
+[31m-            self.refresh_token_expire,[m
+[31m-        )[m
+[31m-[m
+[31m-        session_token = await self.token_service.generate_session_token([m
+[31m-            SessionTokenPayload([m
+[31m-                product=product_payload,[m
+[31m-                session=session_payload,[m
+[31m-                user=user_payload,[m
+[31m-            ),[m
+[31m-            self.session_token_expire,[m
+[31m-        )[m
+[31m-[m
+[31m-        self.cookies_manager.set_cookie([m
+[31m-            command.response,[m
+[31m-            TokenKeyType.ACCESS_TOKEN.value,[m
+[31m-            access_token,[m
+[31m-            self.access_token_expire,[m
+[31m-        )[m
+[31m-[m
+[31m-        self.cookies_manager.set_cookie([m
+[31m-            command.response,[m
+[31m-            TokenKeyType.REFRESH_TOKEN.value,[m
+[31m-            refresh_token,[m
+[31m-            self.refresh_token_expire,[m
+[31m-        )[m
+[31m-[m
+[31m-        self.cookies_manager.set_cookie([m
+[31m-            command.response,[m
+[31m-            TokenKeyType.SESSION_ID_TOKEN.value,[m
+[31m-            session_id_token,[m
+[31m-            self.session_id_token_expire,[m
+[31m-        )[m
+[31m-[m
+[31m-        self.cookies_manager.set_cookie([m
+[31m-            command.response,[m
+[31m-            TokenKeyType.SESSION_TOKEN.value,[m
+[31m-            session_token,[m
+[31m-            self.session_token_expire,[m
+[31m-        )[m
+[31m-[m
+[31m-        self.cookies_manager.set_cookie([m
+[31m-            command.response,[m
+[31m-            TokenKeyType.CSRF_TOKEN.value,[m
+[31m-            csrf_token,[m
+[31m-            self.csrf_token_expire,[m
+[31m-        )[m
+[31m-[m
+[31m-        response_data = {[m
+[31m-            "tokens": {[m
+[31m-                "access_token": {[m
+[31m-                    "token_value": access_token,[m
+[31m-                    "token_expire": self.access_token_expire,[m
+[31m-                    "token_type": "Bearer",[m
+[31m-                },[m
+[31m-                "refresh_token": {[m
+[31m-                    "token_value": refresh_token,[m
+[31m-                    "token_expire": self.refresh_token_expire,[m
+[31m-                    "token_type": "Bearer",[m
+[31m-                },[m
+[31m-                "session_token": {[m
+[31m-                    "token_value": session_token,[m
+[31m-                    "token_expire": self.session_token_expire,[m
+[31m-                    "token_type": "Bearer",[m
+[31m-                },[m
+[31m-                "session_id_token": {[m
+[31m-                    "token_value": session_id_token,[m
+[31m-                    "token_expire": self.session_id_token_expire,[m
+[31m-                    "token_type": "uuid",[m
+[31m-                },[m
+[31m-                "csrf_token": {[m
+[31m-                    "token_value": csrf_token,[m
+[31m-                    "token_expire": self.csrf_token_expire,[m
+[31m-                    "token_type": "uuid",[m
+[31m-                },[m
+[31m-            },[m
+[31m-            "message": "Login successful",[m
+[31m-        }[m
+[31m-[m
+[31m-        _response = JSONResponse([m
+[31m-            content=response_data,[m
+[31m-            headers=command.response.headers,[m
+[31m-            status_code=200,[m
+[31m-        )[m
+[31m-        return _response[m
+[31m-[m
+[31m-        # response_add_security_headers(command.response)[m
+[31m-        # response_set_form_encoded_content_type(command.response)[m
+[31m-        # response_add_redirect_location_header(command.response, "/")[m
+[31m-        # urlencoded_content = urlencode(response_data)[m
+[31m-        # _response = Response([m
+[31m-        #     content=urlencoded_content,[m
+[31m-        #     media_type="application/x-www-form-urlencoded",[m
+[31m-        #     headers=command.response.headers,[m
+[31m-        #     status_code=200[m
+[31m-        # )[m
+[31m-        # return _response[m
+[31m-        # return LoginResponseModel([m
+[31m-        #     # data=response_data,[m
+[31m-        #     message="Login Successfully"[m
+[31m-        # )[m
+[31m-[m
+[31m-    async def login([m
+[31m-        self, command: LoginCommand[m
+[31m-    ) -> LoginResponseModel | Response:[m
+[31m-        try:[m
+[31m-            login_method_handlers = {[m
+[31m-                "password": self.login_password,[m
+[31m-                # "oauth":None,[m
+[31m-                # "totp": None[m
+[31m-            }[m
+[31m-            handler = login_method_handlers[command.login_method][m
+[31m-            response = await handler(command=command)[m
+[31m-            return response[m
+[31m-        except KeyError as e:[m
+[31m-            logger.error(e, exc_info=True)[m
+[31m-            raise WebServiceError([m
+[31m-                title="invalid login method(Optimistic)",[m
+[31m-                description=f"invalid login method = {command.login_method}",[m
+[31m-                error_severity="NONE_OPERATIONAL",[m
+[31m-                error_code=400,[m
+[31m-            )[m
+[31m-[m
+[31m-    async def logout([m
+[31m-        self, command: LogoutCommand[m
+[31m-    ) -> LogoutResponseModel | Response:[m
+[31m-        csrf_token = self.cookies_manager.get_cookie([m
+[31m-            command.request, TokenKeyType.CSRF_TOKEN.value[m
+[31m-        )[m
+[31m-        if csrf_token is not None:[m
+[31m-            self.cookies_manager.delete_cookie([m
+[31m-                command.response, TokenKeyType.CSRF_TOKEN.value[m
+[31m-            )[m
+[31m-[m
+[31m-        session_id = self.cookies_manager.get_cookie([m
+[31m-            command.request, TokenKeyType.SESSION_ID_TOKEN.value[m
+[31m-        )[m
+[31m-        if session_id is not None:[m
+[31m-            # revoke[m
+[31m-            user_session_data = ([m
+[31m-                await self.user_active_session_service.get_user_session([m
+[31m-                    session_id[m
+[31m-                )[m
+[31m-            )[m
+[31m-            if user_session_data is not None:[m
+[31m-                try:[m
+[31m-                    user_session = UserSessionData.model_validate([m
+[31m-                        user_session_data[m
+[31m-                    )[m
+[31m-                except ValidationError:[m
+[31m-                    logger.warning([m
+[31m-                        "failed to validate user session data, this should not happen"[m
+[31m-                    )[m
+[31m-                else:[m
+[31m-                    user_sessions_key = self.get_user_sessions_key([m
+[31m-                        user_session.user_id[m
+[31m-                    )[m
+[31m-[m
+[31m-                    delete_user_session_response = await self.user_active_session_service.delete_user_session([m
+[31m-                        session_id[m
+[31m-                    )[m
+[31m-                    delete_user_from_user_sessions_response = await self.user_active_session_service.delete_user_session_from_user_sessions([m
+[31m-                        session_id, user_sessions_key[m
+[31m-                    )[m
+[31m-                    delete_empty_user_sessions_response = await self.user_active_session_service.delete_empty_user_sessions([m
+[31m-                        user_sessions_key[m
+[31m-                    )[m
+[31m-[m
+[31m-                    if user_session.product_id is not None:[m
+[31m-                        product_sessions_key = self.get_product_sessions_key([m
+[31m-                            user_session.product_id[m
+[31m-                        )[m
+[31m-                        delete_user_from_product_sessions_response = await self.user_active_session_service.delete_user_session_from_product_sessions([m
+[31m-                            session_id, product_sessions_key[m
+[31m-                        )[m
+[31m-                        logger.debug([m
+[31m-                            f"""[m
+[31m-                            Logout:[m
+[31m-                                delete_user_session_response: {delete_user_session_response}[m
+[31m-                                delete_user_from_user_sessions_response: {delete_user_from_user_sessions_response}[m
+[31m-                                delete_empty_user_sessions_response: {delete_empty_user_sessions_response}[m
+[31m-                                delete_user_from_product_sessions_response: {delete_user_from_product_sessions_response}[m
+[31m-                            """[m
+[31m-                        )[m
+[31m-                    else:[m
+[31m-                        logger.debug([m
+[31m-                            f"""[m
+[31m-                            Logout:[m
+[31m-                                delete_user_session_response: {delete_user_session_response}[m
+[31m-                                delete_user_from_user_sessions_response: {delete_user_from_user_sessions_response}[m
+[31m-                                delete_empty_user_sessions_response: {delete_empty_user_sessions_response}[m
+[31m-                            """[m
+[31m-                        )[m
+[31m-            self.cookies_manager.delete_cookie([m
+[31m-                command.response, TokenKeyType.SESSION_ID_TOKEN.value[m
+[31m-            )[m
+[31m-[m
+[31m-        session_token_cookie = self.cookies_manager.get_cookie([m
+[31m-            command.request, TokenKeyType.SESSION_TOKEN.value[m
+[31m-        )[m
+[31m-        if session_token_cookie is not None:[m
+[31m-            # revoke[m
+[31m-            self.cookies_manager.delete_cookie([m
+[31m-                command.response, TokenKeyType.SESSION_TOKEN.value[m
+[31m-            )[m
+[31m-[m
+[31m-        access_token_cookie = self.cookies_manager.get_cookie([m
+[31m-            command.request, TokenKeyType.ACCESS_TOKEN.value[m
+[31m-        )[m
+[31m-        if access_token_cookie is not None:[m
+[31m-            # revoke[m
+[31m-            self.cookies_manager.delete_cookie([m
+[31m-                command.response, TokenKeyType.ACCESS_TOKEN.value[m
+[31m-            )[m
+[32m+[m[32m        self.login_service = login_service[m
+[32m+[m[32m        self.signup_service = signup_service[m
+[32m+[m[32m        self.verify_service = verify_service[m
+[32m+[m[32m        self.refresh_service = refresh_service[m
+[32m+[m[32m        self.logout_service = logout_service[m
+[32m+[m[32m        self.identity_service = identity_service[m
+ [m
+[31m-        refresh_token_cookie = self.cookies_manager.get_cookie([m
+[31m-            command.request, TokenKeyType.REFRESH_TOKEN.value[m
+[31m-        )[m
+[31m-        if refresh_token_cookie is not None:[m
+[31m-            # revoke[m
+[31m-            self.cookies_manager.delete_cookie([m
+[31m-                command.response, TokenKeyType.REFRESH_TOKEN.value[m
+[31m-            )[m
+[32m+[m[32m    async def register(self, command: RegisterCommand):[m
+[32m+[m[32m        return await self.signup_service.signup(command)[m
+ [m
+[31m-        return LogoutResponseModel(message="Logged out successfully")[m
+[32m+[m[32m    async def login(self, command: LoginCommand):[m
+[32m+[m[32m        return await self.login_service.login(command)[m
+ [m
+[31m-    async def _verify(self, command: VerifyCommand):[m
+[31m-        verified_data = {}[m
+[31m-        if command.verify_csrf_token:[m
+[31m-            csrf_token = await self.verify_csrf_token(command.request)[m
+[31m-            verified_data[TokenKeyType.CSRF_TOKEN.value] = csrf_token[m
+[31m-[m
+[31m-        if command.verify_session_id_token:[m
+[31m-            data = await self.verify_session_id_token(command.request)[m
+[31m-            data = data.model_dump([m
+[31m-                exclude_defaults=False,[m
+[31m-                exclude_none=False,[m
+[31m-                exclude_unset=False,[m
+[31m-            )[m
+[31m-            verified_data[TokenKeyType.SESSION_ID_TOKEN.value] = data[m
+[31m-[m
+[31m-        if command.verify_session_token:[m
+[31m-            data = await self.verify_session_token(command.request)[m
+[31m-            data = data.model_dump([m
+[31m-                exclude_defaults=False,[m
+[31m-                exclude_none=False,[m
+[31m-                exclude_unset=False,[m
+[31m-            )[m
+[31m-            verified_data[TokenKeyType.SESSION_TOKEN.value] = data[m
+[31m-[m
+[31m-        if command.verify_access_token:[m
+[31m-            data = await self.verify_access_token(command.request)[m
+[31m-            data = data.model_dump([m
+[31m-                exclude_defaults=False,[m
+[31m-                exclude_none=False,[m
+[31m-                exclude_unset=False,[m
+[31m-            )[m
+[31m-            verified_data[TokenKeyType.ACCESS_TOKEN.value] = data[m
+[31m-[m
+[31m-        if command.verify_refresh_token:[m
+[31m-            data = await self.verify_refresh_token(command.request)[m
+[31m-            data = data.model_dump([m
+[31m-                exclude_defaults=False,[m
+[31m-                exclude_none=False,[m
+[31m-                exclude_unset=False,[m
+[31m-            )[m
+[31m-            verified_data[TokenKeyType.REFRESH_TOKEN.value] = data[m
+[31m-[m
+[31m-        return JSONResponse(content=verified_data, status_code=200)[m
+[32m+[m[32m    async def logout(self, command: LogoutCommand):[m
+[32m+[m[32m        return await self.logout_service.logout(command)[m
+ [m
+     async def verify(self, command: VerifyCommand):[m
+[31m-        verified_data = {}[m
+[31m-        command.response.status_code = 401[m
+[31m-[m
+[31m-        if command.verify_csrf_token:[m
+[31m-            csrf_token = command.request.headers.get([m
+[31m-                CSRF_TOKEN_HEADER_KEY, None[m
+[31m-            )[m
+[31m-            if csrf_token is None:[m
+[31m-                raise WebServiceError([m
+[31m-                    title="invalid request need csrf token header",[m
+[31m-                    error_code=400,[m
+[31m-                    description="CSRF token header is missing.",[m
+[31m-                )[m
+[31m-[m
+[31m-            if not isinstance(csrf_token, str):[m
+[31m-                raise WebServiceError([m
+[31m-                    title="invalid request csrf token is not a string",[m
+[31m-                    error_code=400,[m
+[31m-                    description="invalid request csrf token is not a string",[m
+[31m-                )[m
+[31m-[m
+[31m-            csrf_token_cookie = self.cookies_manager.get_cookie([m
+[31m-                command.request, TokenKeyType.CSRF_TOKEN.value, None[m
+[31m-            )[m
+[31m-[m
+[31m-            if csrf_token_cookie is None:[m
+[31m-                raise WebServiceError([m
+[31m-                    title="invalid request need csrf cookie",[m
+[31m-                    error_code=401,[m
+[31m-                    description="CSRF cookie is missing.",[m
+[31m-                )[m
+[31m-[m
+[31m-            if csrf_token != csrf_token_cookie:[m
+[31m-                logger.warning([m
+[31m-                    "CSRF tokens do not match, might be malicious..."[m
+[31m-                )[m
+[31m-                # TODO blacklist ip[m
+[31m-                self.cookies_manager.delete_cookie([m
+[31m-                    command.response, TokenKeyType.CSRF_TOKEN.value[m
+[31m-                )[m
+[31m-                command.response.status_code = 401[m
+[31m-                return command.response[m
+[31m-[m
+[31m-            verified_data[TokenKeyType.CSRF_TOKEN.value] = csrf_token[m
+[31m-[m
+[31m-        if command.verify_session_id_token:[m
+[31m-            session_id = self.cookies_manager.get_cookie([m
+[31m-                command.request, TokenKeyType.SESSION_ID_TOKEN.value[m
+[31m-            )[m
+[31m-            if session_id is None:[m
+[31m-                raise WebServiceError([m
+[31m-                    title="invalid session id",[m
+[31m-                    error_code=401,[m
+[31m-                    description="session id cookie is missing.",[m
+[31m-                )[m
+[31m-[m
+[31m-            user_session_data = ([m
+[31m-                await self.user_active_session_service.get_user_session([m
+[31m-                    session_id[m
+[31m-                )[m
+[31m-            )[m
+[31m-            if user_session_data is None:[m
+[31m-                self.cookies_manager.delete_cookie([m
+[31m-                    command.response, TokenKeyType.SESSION_ID_TOKEN.value[m
+[31m-                )[m
+[31m-                command.response.status_code = 401[m
+[31m-                return command.response[m
+[31m-            else:[m
+[31m-                await self.user_active_session_service.update_user_session_expire([m
+[31m-                    session_id, self.session_ttl[m
+[31m-                )[m
+[31m-[m
+[31m-            try:[m
+[31m-                user_session = UserSessionData.model_validate([m
+[31m-                    user_session_data[m
+[31m-                )[m
+[31m-            except ValidationError:[m
+[31m-                logger.warning([m
+[31m-                    f"validation failure for user session data: {user_session_data}"[m
+[31m-                )[m
+[31m-            else:[m
+[31m-                data = user_session.model_dump([m
+[31m-                    exclude_defaults=False,[m
+[31m-                    exclude_none=False,[m
+[31m-                    exclude_unset=False,[m
+[31m-                )[m
+[31m-                verified_data[TokenKeyType.SESSION_ID_TOKEN.value] = data[m
+[31m-[m
+[31m-        if command.verify_session_token:[m
+[31m-            session_token = self.cookies_manager.get_cookie([m
+[31m-                command.request, TokenKeyType.SESSION_TOKEN.value[m
+[31m-            )[m
+[31m-            if session_token is None:[m
+[31m-                raise WebServiceError([m
+[31m-                    title="session token cookie does not exists",[m
+[31m-                    error_code=401,[m
+[31m-                )[m
+[31m-            try:[m
+[31m-                session_token_payload = ([m
+[31m-                    await self.token_service.verify_session_token([m
+[31m-                        session_token[m
+[31m-                    )[m
+[31m-                )[m
+[31m-            except Exception:[m
+[31m-                self.cookies_manager.delete_cookie([m
+[31m-                    command.response, TokenKeyType.SESSION_TOKEN.value[m
+[31m-                )[m
+[31m-                command.response.status_code = 401[m
+[31m-                return command.response[m
+[31m-            else:[m
+[31m-                if not isinstance(session_token_payload, dict):[m
+[31m-                    session_token_payload = session_token_payload.model_dump([m
+[31m-                        exclude_defaults=False,[m
+[31m-                        exclude_none=False,[m
+[31m-                        exclude_unset=False,[m
+[31m-                    )[m
+[31m-[m
+[31m-                verified_data[TokenKeyType.SESSION_TOKEN.value] = ([m
+[31m-                    session_token_payload[m
+[31m-                )[m
+[31m-[m
+[31m-        if command.verify_access_token:[m
+[31m-            access_token = self.cookies_manager.get_cookie([m
+[31m-                command.request, TokenKeyType.ACCESS_TOKEN.value[m
+[31m-            )[m
+[31m-            if access_token is None:[m
+[31m-                raise WebServiceError([m
+[31m-                    title="access token cookie does not exists", error_code=401[m
+[31m-                )[m
+[31m-            try:[m
+[31m-                access_token_payload = ([m
+[31m-                    await self.token_service.verify_access_token(access_token)[m
+[31m-                )[m
+[31m-            except Exception:[m
+[31m-                self.cookies_manager.delete_cookie([m
+[31m-                    command.response, TokenKeyType.ACCESS_TOKEN.value[m
+[31m-                )[m
+[31m-                command.response.status_code = 401[m
+[31m-                return command.response[m
+[31m-            else:[m
+[31m-                if not isinstance(access_token_payload, dict):[m
+[31m-                    access_token_payload = access_token_payload.model_dump([m
+[31m-                        exclude_defaults=False,[m
+[31m-                        exclude_none=False,[m
+[31m-                        exclude_unset=False,[m
+[31m-                    )[m
+[31m-                verified_data[TokenKeyType.ACCESS_TOKEN.value] = ([m
+[31m-                    access_token_payload[m
+[31m-                )[m
+[31m-[m
+[31m-        if command.verify_refresh_token:[m
+[31m-            refresh_token = self.cookies_manager.get_cookie([m
+[31m-                command.request, TokenKeyType.REFRESH_TOKEN.value[m
+[31m-            )[m
+[31m-            if refresh_token is None:[m
+[31m-                raise WebServiceError([m
+[31m-                    title="access token cookie does not exists", error_code=401[m
+[31m-                )[m
+[31m-            try:[m
+[31m-                refresh_token_payload = ([m
+[31m-                    await self.token_service.verify_refresh_token([m
+[31m-                        refresh_token[m
+[31m-                    )[m
+[31m-                )[m
+[31m-            except Exception:[m
+[31m-                self.cookies_manager.delete_cookie([m
+[31m-                    command.response, TokenKeyType.REFRESH_TOKEN.value[m
+[31m-                )[m
+[31m-                command.response.status_code = 401[m
+[31m-                return command.response[m
+[31m-            else:[m
+[31m-                if not isinstance(refresh_token_payload, dict):[m
+[31m-                    refresh_token_payload = refresh_token_payload.model_dump([m
+[31m-                        exclude_defaults=False,[m
+[31m-                        exclude_none=False,[m
+[31m-                        exclude_unset=False,[m
+[31m-                    )[m
+[31m-                verified_data[TokenKeyType.REFRESH_TOKEN.value] = ([m
+[31m-                    refresh_token_payload[m
+[31m-                )[m
+[31m-[m
+[31m-        return JSONResponse(content=verified_data, status_code=200)[m
+[31m-[m
+[31m-    async def verify_csrf_token(self, request: Request) -> str:[m
+[31m-        logger.info("verifying csrf tokens...")[m
+[31m-        csrf_token = request.headers.get(CSRF_TOKEN_HEADER_KEY, None)[m
+[31m-[m
+[31m-        if csrf_token is None:[m
+[31m-            raise WebServiceError([m
+[31m-                title="invalid request need csrf token header",[m
+[31m-                error_code=400,[m
+[31m-                description="CSRF token header is missing.",[m
+[31m-            )[m
+[31m-[m
+[31m-        if not isinstance(csrf_token, str):[m
+[31m-            raise WebServiceError([m
+[31m-                title="invalid request csrf token is not a string",[m
+[31m-                error_code=400,[m
+[31m-                description="invalid request csrf token is not a string",[m
+[31m-            )[m
+[31m-[m
+[31m-        csrf_token_cookie = self.cookies_manager.get_cookie([m
+[31m-            request, TokenKeyType.CSRF_TOKEN.value, None[m
+[31m-        )[m
+[31m-[m
+[31m-        if csrf_token_cookie is None:[m
+[31m-            raise WebServiceError([m
+[31m-                title="invalid request need csrf cookie",[m
+[31m-                error_code=401,[m
+[31m-                description="CSRF cookie is missing.",[m
+[31m-            )[m
+[31m-[m
+[31m-        if csrf_token != csrf_token_cookie:[m
+[31m-            logger.warning("CSRF tokens do not match, might be malicious...")[m
+[31m-            raise WebServiceError([m
+[31m-                title="CSRF tokens do not match",[m
+[31m-                description=f"CSRF tokens do not match. Header CSRF token: {csrf_token}, Cookie CSRF token: {csrf_token_cookie}",[m
+[31m-                error_code=401,[m
+[31m-            )[m
+[31m-            # TODO blacklist ip[m
+[31m-        return csrf_token[m
+[31m-[m
+[31m-    async def verify_session_id_token([m
+[31m-        self, request: Request[m
+[31m-    ) -> UserSessionData:[m
+[31m-        return await self.verify_active_session(request)[m
+[31m-[m
+[31m-    async def verify_active_session(self, request: Request) -> UserSessionData:[m
+[31m-        session_id = self.cookies_manager.get_cookie([m
+[31m-            request, TokenKeyType.SESSION_ID_TOKEN.value[m
+[31m-        )[m
+[31m-        if session_id is None:[m
+[31m-            raise WebServiceError([m
+[31m-                error_message="session id cookie does not exists",[m
+[31m-                error_code=401,[m
+[31m-            )[m
+[31m-        user_session_data = ([m
+[31m-            await self.user_active_session_service.get_user_session(session_id)[m
+[31m-        )[m
+[31m-        if user_session_data is None:[m
+[31m-            raise WebServiceError([m
+[31m-                error_message="user session does not exists", error_code=401[m
+[31m-            )[m
+[31m-        try:[m
+[31m-            user_session = UserSessionData.model_validate(user_session_data)[m
+[31m-        except ValidationError as e:[m
+[31m-            raise WebServiceError([m
+[31m-                title="failed to validate user session data model",[m
+[31m-                error_code=500,[m
+[31m-                error_message=f"validation failure for user session data: {user_session_data}",[m
+[31m-            ) from e[m
+[31m-        else:[m
+[31m-            return user_session[m
+[31m-[m
+[31m-    async def verify_session_token([m
+[31m-        self, request: Request[m
+[31m-    ) -> SessionTokenPayload:[m
+[31m-        session_token = self.cookies_manager.get_cookie([m
+[31m-            request, TokenKeyType.SESSION_TOKEN.value[m
+[31m-        )[m
+[31m-        if session_token is None:[m
+[31m-            raise WebServiceError([m
+[31m-                title="session token cookie does not exists", error_code=401[m
+[31m-            )[m
+[31m-        try:[m
+[31m-            session_token_payload = ([m
+[31m-                await self.token_service.verify_session_token([m
+[31m-                    session_token, raise_exception=True[m
+[31m-                )[m
+[31m-            )[m
+[31m-            return session_token_payload  # type: ignore[m
+[31m-        except ValidationError as e:[m
+[31m-            raise WebServiceError([m
+[31m-                title="session token invalid structure", error_code=500[m
+[31m-            ) from e[m
+[31m-        except Exception as e:[m
+[31m-            raise WebServiceError([m
+[31m-                title="session token cookie is invalid", error_code=401[m
+[31m-            ) from e[m
+[31m-[m
+[31m-    async def verify_access_token([m
+[31m-        self, request: Request[m
+[31m-    ) -> AccessTokenPayload:[m
+[31m-        access_token = self.cookies_manager.get_cookie([m
+[31m-            request, TokenKeyType.ACCESS_TOKEN.value[m
+[31m-        )[m
+[31m-        if access_token is None:[m
+[31m-            raise WebServiceError([m
+[31m-                title="access token cookie does not exists", error_code=401[m
+[31m-            )[m
+[31m-        try:[m
+[31m-            access_token_payload = ([m
+[31m-                await self.token_service.verify_access_token([m
+[31m-                    access_token, raise_exception=True[m
+[31m-                )[m
+[31m-            )[m
+[31m-            return access_token_payload  # type: ignore[m
+[32m+[m[32m        return await self.verify_service.verify(command)[m
+ [m
+[31m-        except ValidationError as e:[m
+[31m-            raise WebServiceError([m
+[31m-                title="access token invalid structure", error_code=500[m
+[31m-            ) from e[m
+[31m-[m
+[31m-        except Exception as e:[m
+[31m-            raise WebServiceError([m
+[31m-                title="session token cookie is invalid", error_code=401[m
+[31m-            ) from e[m
+[31m-[m
+[31m-    async def verify_refresh_token([m
+[31m-        self, request: Request[m
+[31m-    ) -> RefreshTokenPayload:[m
+[31m-        refresh_token_cookie = self.cookies_manager.get_cookie([m
+[31m-            request, TokenKeyType.REFRESH_TOKEN.value[m
+[31m-        )[m
+[31m-        if refresh_token_cookie is None:[m
+[31m-            raise WebServiceError([m
+[31m-                title="refresh token cookie does not exists", error_code=401[m
+[31m-            )[m
+[31m-        try:[m
+[31m-            refresh_token_payload = ([m
+[31m-                await self.token_service.verify_refresh_token([m
+[31m-                    refresh_token=refresh_token_cookie, raise_exception=True[m
+[31m-                )[m
+[31m-            )[m
+[31m-            return refresh_token_payload  # type: ignore[m
+[31m-        except ValidationError as e:[m
+[31m-            raise WebServiceError([m
+[31m-                title="refresh token invalid structure", error_code=500[m
+[31m-            ) from e[m
+[31m-[m
+[31m-        except Exception as e:[m
+[31m-            raise WebServiceError([m
+[31m-                title="refresh token cookie is invalid", error_code=401[m
+[31m-            ) from e[m
+[32m+[m[32m    async def refresh(self, command: RefreshCommand):[m
+[32m+[m[32m        return await self.refresh_service.refresh(command)[m
+ [m
+     async def whoami(self, command: WhoAmICommand):[m
+[31m-        user_session = await self.verify_active_session(command.request)[m
+[31m-        user_response = await self.user_service.get_user(user_session.user_id)[m
+[31m-        if user_response.status_code != 200:[m
+[31m-            raise WebServiceError([m
+[31m-                error_code=500,[m
+[31m-                error_message="user does not exists ,but does exists in active session",[m
+[31m-            )[m
+[31m-[m
+[31m-        content = user_response.json()[m
+[31m-        return JSONResponse(status_code=200, content=content)[m
+[31m-[m
+[31m-    async def refresh_csrf_token([m
+[31m-        self, command: RefreshCommand, request: Request, response: Response[m
+[31m-    ) -> str | None:[m
+[31m-        csrf_token_expire = await self.refresh_session([m
+[31m-            command, request, response[m
+[31m-        )[m
+[31m-        if csrf_token_expire is not None:[m
+[31m-            csrf_token = await self.token_service.generate_csrf_token()[m
+[31m-            self.cookies_manager.set_cookie([m
+[31m-                response=response,[m
+[31m-                key=TokenKeyType.CSRF_TOKEN.value,[m
+[31m-                value=csrf_token,[m
+[31m-                expire=csrf_token_expire,[m
+[31m-            )[m
+[31m-            return csrf_token[m
+[31m-        else:[m
+[31m-            csrf_token = self.cookies_manager.get_cookie([m
+[31m-                request, TokenKeyType.CSRF_TOKEN.value[m
+[31m-            )[m
+[31m-            if csrf_token is not None:[m
+[31m-                self.cookies_manager.delete_cookie([m
+[31m-                    response, TokenKeyType.CSRF_TOKEN.value[m
+[31m-                )[m
+[31m-[m
+[31m-    async def refresh_session([m
+[31m-        self, command: RefreshCommand, request: Request, response: Response[m
+[31m-    ) -> int | None:[m
+[31m-        session_id = self.cookies_manager.get_cookie([m
+[31m-            request, TokenKeyType.SESSION_ID_TOKEN.value[m
+[31m-        )[m
+[31m-        if session_id is not None:[m
+[31m-            user_session = ([m
+[31m-                await self.user_active_session_service.get_user_session([m
+[31m-                    session_id[m
+[31m-                )[m
+[31m-            )[m
+[31m-            if user_session is not None:[m
+[31m-                ttl = await self.user_active_session_service.get_user_session_expire([m
+[31m-                    session_id[m
+[31m-                )[m
+[31m-                return ttl[m
+[31m-[m
+[31m-        session_token_payload = await self.refresh_session_token([m
+[31m-            command, request, response[m
+[31m-        )[m
+[31m-        if session_token_payload is not None:[m
+[31m-            await self.user_active_session_service.create_user_session([m
+[31m-                session_key=session_token_payload.session.session_id,[m
+[31m-                user_set_key=self.get_user_sessions_key([m
+[31m-                    session_token_payload.user.user_id[m
+[31m-                ),[m
+[31m-                value=UserSessionData([m
+[31m-                    last_activity=datetime_to_string(utcnow()),[m
+[31m-                    user_id=session_token_payload.user.user_id,[m
+[31m-                    product_id=command.product_id,[m
+[31m-                    extend_count=0,[m
+[31m-                    session_id=session_token_payload.session.session_id,[m
+[31m-                    user_email=session_token_payload.user.user_email,[m
+[31m-                    user_username=session_token_payload.user.user_username,[m
+[31m-                ).model_dump(),[m
+[31m-                expire_at=self.session_ttl,[m
+[31m-                product_set_key=self.get_product_sessions_key([m
+[31m-                    session_token_payload.product.product_id[m
+[31m-                ),[m
+[31m-            )[m
+[31m-            self.cookies_manager.set_cookie([m
+[31m-                response=response,[m
+[31m-                key=TokenKeyType.SESSION_ID_TOKEN.value,[m
+[31m-                value=session_token_payload.session.session_id,[m
+[31m-                expire=self.session_id_token_expire,[m
+[31m-            )[m
+[31m-            return self.session_ttl[m
+[31m-[m
+[31m-        if session_id is not None:[m
+[31m-            self.cookies_manager.delete_cookie([m
+[31m-                response, TokenKeyType.SESSION_ID_TOKEN.value[m
+[31m-            )[m
+[31m-[m
+[31m-        return None[m
+[31m-[m
+[31m-    async def refresh_session_token([m
+[31m-        self, command: RefreshCommand, request: Request, response: Response[m
+[31m-    ) -> SessionTokenPayload | None:[m
+[31m-        session_token = self.cookies_manager.get_cookie([m
+[31m-            request, TokenKeyType.SESSION_TOKEN.value[m
+[31m-        )[m
+[31m-        if session_token is not None:[m
+[31m-            try:[m
+[31m-                session_token_payload: SessionTokenPayload = ([m
+[31m-                    await self.token_service.verify_session_token([m
+[31m-                        session_token[m
+[31m-                    )[m
+[31m-                )  # type: ignore[m
+[31m-                return session_token_payload  # valid so its ok its can be used[m
+[31m-            except Exception:  # not valid[m
+[31m-                pass[m
+[31m-[m
+[31m-        access_token_payload = await self.refresh_access_token([m
+[31m-            command, request, response[m
+[31m-        )[m
+[31m-        if access_token_payload is not None:[m
+[31m-            session_id = await self.token_service.generate_session_id_token()[m
+[31m-            payload = SessionTokenPayload([m
+[31m-                product=access_token_payload.product,[m
+[31m-                session=SessionPayload([m
+[31m-                    session_id=session_id,[m
+[31m-                ),[m
+[31m-                user=access_token_payload.user,[m
+[31m-            )[m
+[31m-            new_session_token = ([m
+[31m-                await self.token_service.generate_session_token([m
+[31m-                    payload=payload,[m
+[31m-                    expiration=self.session_token_expire,[m
+[31m-                )[m
+[31m-            )[m
+[31m-            self.cookies_manager.set_cookie([m
+[31m-                response=response,[m
+[31m-                key=TokenKeyType.SESSION_TOKEN.value,[m
+[31m-                value=new_session_token,[m
+[31m-                expire=self.session_token_expire,[m
+[31m-            )[m
+[31m-            return payload[m
+[31m-[m
+[31m-        if session_token is not None:[m
+[31m-            self.cookies_manager.delete_cookie([m
+[31m-                response, TokenKeyType.SESSION_TOKEN.value[m
+[31m-            )[m
+[31m-[m
+[31m-        return None[m
+[31m-[m
+[31m-    async def refresh_access_token([m
+[31m-        self, command: RefreshCommand, request: Request, response: Response[m
+[31m-    ) -> AccessTokenPayload | None:[m
+[31m-        access_token = self.cookies_manager.get_cookie([m
+[31m-            request, TokenKeyType.ACCESS_TOKEN.value[m
+[31m-        )[m
+[31m-        if access_token is not None:[m
+[31m-            try:[m
+[31m-                access_token_payload: AccessTokenPayload = ([m
+[31m-                    await self.token_service.verify_access_token(access_token)[m
+[31m-                )  # type: ignore[m
+[31m-                return access_token_payload[m
+[31m-            except Exception:  # invalid access token[m
+[31m-                pass[m
+[31m-[m
+[31m-        refresh_token_payload = await self.refresh_refresh_token([m
+[31m-            command, request, response[m
+[31m-        )[m
+[31m-        if refresh_token_payload:[m
+[31m-            access_payload = AccessPayload.model_validate([m
+[31m-                self.internal_service_access[m
+[31m-            )[m
+[31m-            payload = AccessTokenPayload([m
+[31m-                access=access_payload,[m
+[31m-                product=refresh_token_payload.product,[m
+[31m-                user=refresh_token_payload.user,[m
+[31m-            )[m
+[31m-            new_access_token = await self.token_service.generate_access_token([m
+[31m-                payload, self.access_token_expire[m
+[31m-            )[m
+[31m-            self.cookies_manager.set_cookie([m
+[31m-                response=response,[m
+[31m-                key=TokenKeyType.ACCESS_TOKEN.value,[m
+[31m-                value=new_access_token,[m
+[31m-                expire=self.access_token_expire,[m
+[31m-            )[m
+[31m-            return payload[m
+[31m-[m
+[31m-        if access_token is not None:[m
+[31m-            self.cookies_manager.delete_cookie([m
+[31m-                response, TokenKeyType.ACCESS_TOKEN.value[m
+[31m-            )[m
+[31m-[m
+[31m-        return None[m
+[31m-[m
+[31m-    async def refresh_refresh_token([m
+[31m-        self, command: RefreshCommand, request: Request, response: Response[m
+[31m-    ) -> RefreshTokenPayload | None:[m
+[31m-        refresh_token = self.cookies_manager.get_cookie([m
+[31m-            request, TokenKeyType.REFRESH_TOKEN.value[m
+[31m-        )[m
+[31m-        if refresh_token is not None:[m
+[31m-            try:[m
+[31m-                refresh_token_payload: RefreshTokenPayload = ([m
+[31m-                    await self.token_service.verify_refresh_token([m
+[31m-                        refresh_token=refresh_token, raise_exception=False[m
+[31m-                    )[m
+[31m-                )  # type: ignore[m
+[31m-                return refresh_token_payload[m
+[31m-            except Exception:[m
+[31m-                pass[m
+[31m-[m
+[31m-        if refresh_token is not None:[m
+[31m-            self.cookies_manager.delete_cookie([m
+[31m-                response, TokenKeyType.REFRESH_TOKEN.value[m
+[31m-            )[m
+[31m-[m
+[31m-        return None[m
+[31m-[m
+[31m-    async def refresh(self, command: RefreshCommand):[m
+[31m-        csrf = await self.refresh_csrf_token([m
+[31m-            command, command.request, command.response[m
+[31m-        )[m
+[31m-        command.response.status_code = 200[m
+[31m-        if csrf is None:[m
+[31m-            command.response.status_code = 401[m
+[31m-        return command.response[m
+[32m+[m[32m        return await self.identity_service.whoami(command)[m
+ [m
+     async def get_user_authentication_data([m
+[31m-        self, command: GetUserAuthenticationDataCommand[m
+[31m-    ):[m
+[31m-        # result = await self.user_active_session_service.get_user_sessions(session_key=command.user_id)[m
+[31m-        # return result[m
+[31m-        pass[m
+[31m-[m
+[31m-    async def get_product_authentication_data([m
+[31m-        self, command: GetProductAuthenticationDataCommand[m
+[32m+[m[32m        self, command: GetUserIdentityCommand[m
+     ):[m
+[31m-        # product_key = command.user_id[m
+[31m-        # result = await self.user_active_session_service.get_product_sessions(product_key)[m
+[31m-        # return result[m
+[31m-        pass[m
+[31m-[m
+[31m-    async def confirm_registration(self, token: str):[m
+[31m-        pass[m
+[31m-[m
+[31m-    async def on_unexpected_behavior(self):[m
+[31m-        logger.info("UNEXCEPTED BEHAVIOR")[m
+[31m-[m
+[31m-    async def encrypt_user_id(self, user_id: str) -> str:[m
+[31m-        user_id_bytes = user_id.encode("utf-8")[m
+[31m-        encrypted_id = self.cipher_suite.encrypt(user_id_bytes)[m
+[31m-        return encrypted_id.decode("utf-8")[m
+[31m-[m
+[31m-    async def decrypt_user_id(self, encrypted_id: str) -> str:[m
+[31m-        try:[m
+[31m-            encrypted_id_bytes = encrypted_id.encode("utf-8")[m
+[31m-            decrypted_id = self.cipher_suite.decrypt(encrypted_id_bytes)[m
+[31m-            return decrypted_id.decode("utf-8")[m
+[31m-        except Exception:[m
+[31m-            raise WebServiceError([m
+[31m-                error_code=400, detail="Invalid encrypted ID"[m
+[31m-            )[m
+[32m+[m[32m        return await self.identity_service.get_user_identity(command)[m
+[1mdiff --git a/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/revocation/revocation_service.py b/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/revocation/revocation_service.py[m
+[1mindex 26afd6a..832a792 100644[m
+[1m--- a/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/revocation/revocation_service.py[m
+[1m+++ b/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/revocation/revocation_service.py[m
+[36m@@ -15,7 +15,7 @@[m [mclass RevocationService:[m
+         await self._cache.delete_set(self.blacklist_tokens)[m
+ [m
+     def get_token_blacklist_name(self, token: str):[m
+[31m-        return f"tokens:blacklist:{token}"[m
+[32m+[m[32m        retyurn f"tokens:blacklist:{token}"[m
+ [m
+     async def is_token_valid(self, token: str) -> bool:[m
+         # response = await self._cache.set_contains(key=self.blacklist_tokens,value=token)[m
+[1mdiff --git a/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/sessions/user_active_session_service.py b/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/sessions/user_active_session_service.py[m
+[1mindex 354d129..38a03ee 100644[m
+[1m--- a/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/sessions/user_active_session_service.py[m
+[1m+++ b/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/sessions/user_active_session_service.py[m
+[36m@@ -12,6 +12,13 @@[m [mfrom pymicroservicesbase.services.authentication_service.logger import logger[m
+ class UserActiveSessionService:[m
+     def __init__(self, cache: AbstractAsyncCache):[m
+         self.cache = cache[m
+[32m+[m[32m        self.online_users_key = "online"[m
+[32m+[m
+[32m+[m[32m    async def on_startup(self):[m
+[32m+[m[32m        pass[m
+[32m+[m
+[32m+[m[32m    async def on_shutdown(self):[m
+[32m+[m[32m        pass[m
+ [m
+     async def create_user_session([m
+         self,[m
+[36m@@ -49,6 +56,10 @@[m [mclass UserActiveSessionService:[m
+                 f"Cache response for add_to_set for {product_set_key}: {product_set}"[m
+             )[m
+ [m
+[32m+[m[32m            await self.cache.add_to_set([m
+[32m+[m[32m                key=self.online_users_key, value=session_key[m
+[32m+[m[32m            )[m
+[32m+[m
+     async def update_user_session_expire(self, session_key: str, seconds: int):[m
+         """Update the TTL for an existing session."""[m
+         logger.debug([m
+[36m@@ -66,7 +77,7 @@[m [mclass UserActiveSessionService:[m
+             await self.cache.set_flat_mapping_key([m
+                 session_key, "extend_count", 1[m
+             )[m
+[31m-            session_expire = await self.cache.set_ttl(session_key, seconds, 2)[m
+[32m+[m[32m            session_expire = await self.cache.set_ttl(session_key, seconds)[m
+             logger.debug([m
+                 f"Cache response for set_expire for {session_key}: {session_expire}"[m
+             )[m
+[36m@@ -163,7 +174,7 @@[m [mclass UserActiveSessionService:[m
+         )[m
+         return session[m
+ [m
+[31m-    async def get_user_session_expire(self, session_key: str) -> int:[m
+[32m+[m[32m    async def get_user_session_expire(self, session_key: str):[m
+         logger.debug(f"Getting expiration for session: {session_key}")[m
+         expire_time = await self.cache.get_ttl(session_key)[m
+         logger.debug([m
+[36m@@ -235,116 +246,16 @@[m [mclass UserActiveSessionService:[m
+         )[m
+         return result[m
+ [m
+[31m-    # async def create_user_session([m
+[31m-    #     self,[m
+[31m-    #     session_key:str,[m
+[31m-    #     user_set_key:str,[m
+[31m-    #     value: Any,[m
+[31m-    #     expire_at: int,[m
+[31m-    #     product_set_key:str|None=None,[m
+[31m-    # ):[m
+[31m-    #     """Create a new user session and add it to the global user session set and product's active session set."""[m
+[31m-    #     logger.debug(f"Creating user session: {session_key}")[m
+[31m-    #     session_create = await self.cache.set_hash([m
+[31m-    #         session_key,[m
+[31m-    #         value[m
+[31m-    #     )[m
+[31m-    #     if session_create:[m
+[31m-    #         logger.debug(f"User session created for session_key: {session_key}")[m
+[31m-    #     else:[m
+[31m-    #         logger.error(f"Failed to create user session for session_key: {session_key}")[m
+[31m-[m
+[31m-    #     session_expire = await self.cache.set_expire([m
+[31m-    #         session_key,[m
+[31m-    #         expire_at[m
+[31m-    #     )[m
+[31m-[m
+[31m-    #     user_set = await self.cache.add_to_set(key=user_set_key, value=session_key)[m
+[31m-    #     if product_set_key is not None:[m
+[31m-    #         product_set = await self.cache.add_to_set(key=product_set_key, value=session_key)[m
+[31m-[m
+[31m-    # async def update_user_session_expire(self, session_key: str,seconds:int):[m
+[31m-    #     """Update the TTL for an existing session."""[m
+[31m-    #     exists = await self.cache.exists(session_key)[m
+[31m-    #     if exists:[m
+[31m-    #         dt = utcnow()[m
+[31m-    #         await self.cache.update_hash_key([m
+[31m-    #             session_key,[m
+[31m-    #             "last_activity",[m
+[31m-    #             datetime_to_string(dt)[m
+[31m-    #         )[m
+[31m-    #         await self.cache.increment_hash_key([m
+[31m-    #             session_key,[m
+[31m-    #             "extend_count",[m
+[31m-    #             1[m
+[31m-    #         )[m
+[31m-    #         await self.cache.set_expire(session_key, seconds)[m
+[31m-    #         return True[m
+[31m-    #     return False[m
+[31m-[m
+[31m-    # async def update_user_session(self,[m
+[31m-    #     session_key: str,[m
+[31m-    #     value,[m
+[31m-    # ):[m
+[31m-    #     """Update the TTL for an existing session."""[m
+[31m-    #     res = await self.cache.update_hash([m
+[31m-    #         session_key,[m
+[31m-    #         value[m
+[31m-    #     )[m
+[31m-    #     return res[m
+[31m-[m
+[31m-    # async def delete_user_session([m
+[31m-    #     self,[m
+[31m-    #     session_key: str,[m
+[31m-    #     user_set_key:str,[m
+[31m-    #     product_set_key:str|None=None[m
+[31m-    # ):[m
+[31m-    #     """Delete a user session."""[m
+[31m-    #     await self.cache.delete_key(session_key)[m
+[31m-    #     user_set_length = await self.cache.get_set_length(user_set_key)[m
+[31m-    #     if user_set_length > 0:[m
+[31m-    #         await self.cache.remove_from_set(user_set_key,session_key)[m
+[31m-    #         user_set_length -= 1[m
+[31m-[m
+[31m-    #     if user_set_length == 0:[m
+[31m-    #         await self.cache.delete_key(user_set_key)[m
+[31m-[m
+[31m-    #     if product_set_key is not None:[m
+[31m-    #         product_set_length = await self.cache.get_set_length(product_set_key)[m
+[31m-    #         if product_set_length > 0:[m
+[31m-    #             await self.cache.remove_from_set(product_set_key,session_key)[m
+[31m-    #             product_set_length -= 1[m
+[31m-[m
+[31m-    #         if product_set_length == 0:[m
+[31m-    #             await self.cache.delete_key(product_set_key)[m
+[31m-[m
+[31m-    # async def get_user_session(self, session_key: str):[m
+[31m-    #     return await self.cache.get_all_hash_keys(session_key)[m
+[31m-[m
+[31m-    # async def get_user_session_expire(self, session_key: str) -> int:[m
+[31m-    #     return await self.cache.get_expire(session_key)[m
+[31m-[m
+[31m-    # async def get_user_sessions_ids(self, user_set_key: str):[m
+[31m-    #     set_members = await self.cache.get_set(user_set_key)[m
+[31m-    #     return set_members[m
+[31m-[m
+[31m-    # async def get_user_sessions(self, user_set_key: str):[m
+[31m-    #     set_members = await self.cache.get_set(user_set_key)[m
+[31m-    #     tasks = [self.cache.get_all_hash_keys(member) for member in set_members][m
+[31m-    #     result = await asyncio.gather(*tasks)[m
+[31m-    #     return result[m
+[31m-[m
+[31m-    # async def get_product_sessions_ids(self, product_set_key: str):[m
+[31m-    #     set_members = await self.cache.get_set(product_set_key)[m
+[31m-    #     return set_members[m
+[31m-[m
+[31m-    # async def get_product_sessions(self, product_set_key: str):[m
+[31m-    #     set_members = await self.cache.get_set(product_set_key)[m
+[31m-    #     tasks = [self.cache.get_all_hash_keys(member) for member in set_members][m
+[31m-    #     result = await asyncio.gather(*tasks)[m
+[31m-    #     return result[m
+[31m-[m
+[31m-    # async def delete_all_product_sessions(self,product_set_key:str):[m
+[31m-    #     logger.debug(f"Deleting all product sessions for product set key: {product_set_key}")[m
+[31m-    #     result = await self.cache.delete_key(product_set_key)[m
+[31m-    #     return result[m
+[32m+[m[32m    async def get_online_users_sessions_ids(self):[m
+[32m+[m[32m        sessions = await self.cache.get_set_members(self.online_users_key)[m
+[32m+[m[32m        return sessions[m
+[32m+[m
+[32m+[m[32m    async def get_online_users_sessions(self):[m
+[32m+[m[32m        sessions_ids = await self.get_online_users_sessions_ids()[m
+[32m+[m[32m        # sessions_ids[m
+[32m+[m[32m        # asyncio.gather()[m
+[32m+[m
+[32m+[m[32m    async def delete_user_session_from_online(self, session_key: str):[m
+[32m+[m[32m        return await self.cache.remove_from_set([m
+[32m+[m[32m            self.online_users_key, session_key[m
+[32m+[m[32m        )[m
+[1mdiff --git a/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/tokens/tokens_service.py b/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/tokens/tokens_service.py[m
+[1mindex 34b1afb..20d6894 100644[m
+[1m--- a/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/tokens/tokens_service.py[m
+[1m+++ b/pymicroservicesbase/services/authentication_service/src/authentication/domain/services/tokens/tokens_service.py[m
+[36m@@ -1,6 +1,5 @@[m
+ from typing import Any, Dict[m
+ [m
+[31m-from pydantic import ValidationError[m
+ [m
+ from pymicroservicesbase.services.authentication_service.src.authentication.domain.services.tokens.payloads import ([m
+     AccessTokenPayload,[m
+[36m@@ -9,7 +8,6 @@[m [mfrom pymicroservicesbase.services.authentication_service.src.authentication.doma[m
+ )[m
+ from pymicroservicesbase.utils.tokens.token_factory import TokenFactory[m
+ from pymicroservicesbase.utils.tokens.token_type import TokenType[m
+[31m-from pymicroservicesbase.services.authentication_service.logger import logger[m
+ [m
+ [m
+ class TokenService:[m
+[36m@@ -32,9 +30,16 @@[m [mclass TokenService:[m
+         payload_dict = payload.model_dump([m
+             exclude_defaults=False, exclude_unset=False, exclude_none=False[m
+         )[m
+[31m-        return jwt_token_generator.generate_token([m
+[32m+[m[32m        token = jwt_token_generator.generate_token([m
+             expiration_time_in_seconds=expiration, payload=payload_dict[m
+         )[m
+[32m+[m[32m        return token[m
+[32m+[m[32m        # TokenPayload([m
+[32m+[m[32m        #     token_title=TokenKeyType.ACCESS_TOKEN,[m
+[32m+[m[32m        #     token_value=token,[m
+[32m+[m[32m        #     token_expire=expiration,[m
+[32m+[m[32m        #     token_type=jwt_token_generator.token_type[m
+[32m+[m[32m        # )[m
+ [m
+     async def generate_refresh_token([m
+         self, payload: RefreshTokenPayload, expiration: int[m
+[36m@@ -67,49 +72,27 @@[m [mclass TokenService:[m
+         return uuid_token_generator.generate_token()[m
+ [m
+     async def verify_access_token([m
+[31m-        self, access_token: str, raise_exception: bool = False[m
+[31m-    ) -> AccessTokenPayload | Dict[str, Any]:[m
+[32m+[m[32m        self, access_token: str[m
+[32m+[m[32m    ) -> AccessTokenPayload:[m
+         payload = await self._verify_jwt_token(access_token)[m
+[31m-        try:[m
+[31m-            access_token_payload = AccessTokenPayload.model_validate(payload)[m
+[31m-            return access_token_payload[m
+[31m-        except ValidationError as e:[m
+[31m-            logger.warning([m
+[31m-                f"failed to validate model to access token from payload: {payload}"[m
+[31m-            )[m
+[31m-            if raise_exception:[m
+[31m-                raise e[m
+[31m-            return payload[m
+[32m+[m[32m        access_token_payload = AccessTokenPayload.model_validate(payload)[m
+[32m+[m[32m        return access_token_payload[m
+ [m
+     async def verify_refresh_token([m
+[31m-        self, refresh_token: str, raise_exception: bool = False[m
+[31m-    ) -> RefreshTokenPayload | Dict[str, Any]:[m
+[32m+[m[32m        self,[m
+[32m+[m[32m        refresh_token: str,[m
+[32m+[m[32m    ) -> RefreshTokenPayload:[m
+         payload = await self._verify_jwt_token(refresh_token)[m
+[31m-        try:[m
+[31m-            refresh_token_payload = RefreshTokenPayload.model_validate(payload)[m
+[31m-            return refresh_token_payload[m
+[31m-        except ValidationError as e:[m
+[31m-            logger.warning([m
+[31m-                f"failed to validate model to refresh token from payload: {payload}"[m
+[31m-            )[m
+[31m-            if raise_exception:[m
+[31m-                raise e[m
+[31m-            return payload[m
+[32m+[m[32m        refresh_token_payload = RefreshTokenPayload.model_validate(payload)[m
+[32m+[m[32m        return refresh_token_payload[m
+ [m
+     async def verify_session_token([m
+[31m-        self, session_token: str, raise_exception: bool = False[m
+[31m-    ) -> SessionTokenPayload | Dict[str, Any]:[m
+[32m+[m[32m        self,[m
+[32m+[m[32m        session_token: str,[m
+[32m+[m[32m    ) -> SessionTokenPayload:[m
+         payload = await self._verify_jwt_token(session_token)[m
+[31m-        try:[m
+[31m-            session_token_payload = SessionTokenPayload.model_validate(payload)[m
+[31m-            return session_token_payload[m
+[31m-        except ValidationError as e:[m
+[31m-            logger.warning([m
+[31m-                f"failed to validate model to session token from payload: {payload}"[m
+[31m-            )[m
+[31m-            if raise_exception:[m
+[31m-                raise e[m
+[31m-            return payload[m
+[32m+[m[32m        session_token_payload = SessionTokenPayload.model_validate(payload)[m
+[32m+[m[32m        return session_token_payload[m
+ [m
+     async def _verify_jwt_token(self, token: str) -> Dict[str, Any]:[m
+         payload = self.token_factory.get(TokenType.JWT).verify_token([m
+[1mdiff --git a/pymicroservicesbase/services/user_service/src/users/domain/services/user_service.py b/pymicroservicesbase/services/user_service/src/users/domain/services/user_service.py[m
+[1mindex cbb43c0..2e50bc3 100644[m
+[1m--- a/pymicroservicesbase/services/user_service/src/users/domain/services/user_service.py[m
+[1m+++ b/pymicroservicesbase/services/user_service/src/users/domain/services/user_service.py[m
+[36m@@ -43,14 +43,19 @@[m [mfrom pymicroservicesbase.services.user_service.src.database.connection import ([m
+ class UserService:[m
+     def __init__(self, repository: UserRepository):[m
+         self.user_repository = repository[m
+[32m+[m[32m        logger.debug("UserService initialized with UserRepository")[m
+[32m+[m
+ [m
+     @db.transactional()[m
+     async def create_user([m
+         self, command: CreateUserCommand[m
+     ) -> UserResponseModel:[m
+[32m+[m[32m        logger.info("Starting user creation process.")[m
+         try:[m
+             new_user_data = command.data.model_dump(exclude_unset=True)[m
+[32m+[m[32m            logger.debug(f"Received user data for creation: {new_user_data}")[m
+         except PydanticSerializationError:[m
+[32m+[m[32m            logger.error("Data parsing error during user creation.")[m
+             raise WebServiceError([m
+                 title="Parsing Error",[m
+                 user_message="Data is required to create a user.",[m
+[36m@@ -58,6 +63,7 @@[m [mclass UserService:[m
+             )[m
+         try:[m
+             password = new_user_data.pop("password")[m
+[32m+[m[32m            logger.debug("Extracted password from user data.")[m
+         except KeyError:[m
+             logger.error("Password is missing while creating user.")[m
+             raise WebServiceError([m
+[36m@@ -69,16 +75,19 @@[m [mclass UserService:[m
+             salt = bcrypt.gensalt()[m
+             new_user_data["hashed_password"] = hash_password(password, salt)[m
+             new_user_data["password_salt"] = salt[m
+[32m+[m[32m            logger.debug("Password hashed and added to user data.")[m
+             new_user = await self.user_repository.create(new_user_data)[m
+[31m-            logger.info(f"User created successfully: {new_user.id}")[m
+[32m+[m[32m            logger.info(f"User created successfully with ID: {new_user.id}")[m
+             user_data = self._to_user_representation(new_user, command)[m
+             return UserResponseModel([m
+                 data=user_data, message="User successfully created!"[m
+             )[m
+ [m
+     async def get_user(self, command: GetUserCommand) -> UserResponseModel:[m
+[32m+[m[32m        logger.info(f"Fetching user with ID: {command.user_id}")[m
+         try:[m
+             user = await self.user_repository.get_user_by_id(command.user_id)[m
+[32m+[m[32m            logger.debug(f"User data retrieved: {user}")[m
+         except NoResultFound:[m
+             logger.error(f"User with ID {command.user_id} not found.")[m
+             raise WebServiceError([m
+[36m@@ -99,28 +108,13 @@[m [mclass UserService:[m
+     async def update_user([m
+         self, command: UpdateUserCommand[m
+     ) -> UserResponseModel:[m
+[31m-        # try:[m
+[31m-[m
+[31m-        # user = await self.user_repository.get_user_by_id(command.user_id)[m
+[31m-        # # self.user_repository.update()[m
+[31m-[m
+[31m-        # if user is None:[m
+[31m-        #     logger.error([m
+[31m-        #         f"User with ID {command.user_id} not found for update."[m
+[31m-        #     )[m
+[31m-        #     raise WebServiceError([m
+[31m-        #         title="User Not Found",[m
+[31m-        #         description="The user could not be found to update.",[m
+[31m-        #         user_message="User not found. Please verify the ID and try again.",[m
+[31m-        #         error_category_type="NOT_FOUND_ERROR",[m
+[31m-        #         error_code=status.HTTP_404_NOT_FOUND,[m
+[31m-        #         kwargs={"command": command},[m
+[31m-        #     )[m
+         try:[m
+             _update_user_data = command.attributes.model_dump()[m
+[32m+[m[32m            logger.debug(f"Update data received: {_update_user_data}")[m
+             _update_user_data.pop("id", None)[m
+             _password = _update_user_data.pop("password", None)[m
+             if _password is not None:[m
+[32m+[m[32m                logger.debug("Hashing new password for the user.")[m
+                 salt = bcrypt.gensalt()[m
+                 _update_user_data["password_salt"] = salt[m
+                 _update_user_data["hashed_password"] = hash_password([m
+[36m@@ -130,6 +124,7 @@[m [mclass UserService:[m
+             res = await self.user_repository.update_by_id([m
+                 command.user_id, _update_user_data[m
+             )[m
+[32m+[m[32m            logger.info(f"User with ID {command.user_id} successfully updated.")[m
+             user_data = self._to_user_representation(res, command)[m
+             return UserResponseModel([m
+                 data=user_data, message="User successfully updated!"[m
+[36m@@ -137,32 +132,23 @@[m [mclass UserService:[m
+         except Exception as e:[m
+             logger.error(e)[m
+             raise e[m
+[31m-        finally:[m
+[31m-            pass[m
+ [m
+     @db.transactional()[m
+     async def delete_user(self, command: DeleteUserCommand) -> Any:[m
+[32m+[m[32m        logger.info(f"Attempting to delete user with ID: {command.user_id}")[m
+         try:[m
+[31m-            logger.info([m
+[31m-                f"Attempting to delete user with ID: {command.user_id}"[m
+[31m-            )[m
+             res = await self.user_repository.delete_by_id(command.user_id)[m
+[31m-            logger.info(res)[m
+[32m+[m[32m            logger.debug(f"Delete operation result: {res}")[m
+         except Exception as e:[m
+[31m-            logger.error(e)[m
+[32m+[m[32m            logger.error(f"Error during deletion of user with ID {command.user_id}: {e}")[m
+             raise WebServiceError([m
+[31m-                title="User Not Found",[m
+[31m-                description=f"User with ID {command.user_id} could not be found for deletion.",[m
+[31m-                user_message="The user with the specified ID does not exist. Deletion failed.",[m
+[32m+[m[32m                error_message="The user with the specified ID does not exist. Deletion failed.",[m
+                 error_code=status.HTTP_404_NOT_FOUND,[m
+[31m-                error_category_type="NOT_FOUND_ERROR",[m
+[31m-                kwargs={"command": command},[m
+[32m+[m[32m                is_public=True[m
+             ) from e[m
+         else:[m
+             user_data = self._to_user_representation(res, command)[m
+[31m-            logger.info([m
+[31m-                f"User with ID {command.user_id} deleted successfully."[m
+[31m-            )[m
+[32m+[m[32m            logger.info(f"User with ID {command.user_id} deleted successfully.")[m
+             return UserResponseModel([m
+                 data=user_data, message="User successfully deleted!"[m
+             )[m
+[36m@@ -170,13 +156,19 @@[m [mclass UserService:[m
+     async def get_many_users([m
+         self, command: GetManyUsersCommand[m
+     ) -> UsersResponseModel:[m
+[31m-        logger.info([m
+[31m-            f"Fetching users with query parameters: {command.query_params}"[m
+[31m-        )[m
+ [m
+[31m-        users, total = await self.user_repository.get_many([m
+[31m-            **command.query_params.model_dump()[m
+[31m-        )[m
+[32m+[

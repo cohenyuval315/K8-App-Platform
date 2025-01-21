@@ -47,9 +47,6 @@ from pymicroservicesbase.sdk.web_api.core_api.errors.set_error_handlers import (
 from pymicroservicesbase.sdk.web_api.core_api.logging.logging_middleware import (
     LoggingMiddleware,
 )
-from pymicroservicesbase.sdk.web_api.core_api.logging.web_service_logger import (
-    WebServiceLogger,
-)
 from pymicroservicesbase.sdk.web_api.core_api.requests.request_id.request_id_middleware import (
     RequestIdContextMiddleware,
 )
@@ -68,19 +65,21 @@ from pymicroservicesbase.sdk.web_api.web_context import WebContext
 from pymicroservicesbase.shared.constants.headers import (
     CORRELATION_ID_HEADER_KEY,
 )
+from pymicroservicesbase.shared.logging import get_logger
 
 
 def create_web_service_container(
     config: BaseWebServiceConfig,
-    logger: WebServiceLogger,
     lifespan,
     routers: List[WebRouter] | None = None,
     health_checks: Dict[str, Callable] | None = {},
     with_web_service_error: bool = True,
+    *args,
+    **kwargs,
 ) -> WebServiceContainer:
-    logger.info(f"starting {config.app_config.APP_NAME}")
     wsc = create_base_web_service_container(config, lifespan)
     web_service = wsc.get_web_service()
+    logger = get_logger()
 
     # Routes
     root_router = WebRouter()

@@ -2,7 +2,7 @@ from typing import Annotated
 
 from pydantic import StringConstraints
 
-UserNameType = Annotated[
+UserNameStrType = Annotated[
     str,
     StringConstraints(
         strip_whitespace=True,

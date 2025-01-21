@@ -43,14 +43,19 @@ from pymicroservicesbase.services.user_service.src.database.connection import (
 class UserService:
     def __init__(self, repository: UserRepository):
         self.user_repository = repository
+        logger.debug("UserService initialized with UserRepository")
+
 
     @db.transactional()
     async def create_user(
         self, command: CreateUserCommand
     ) -> UserResponseModel:
+        logger.info("Starting user creation process.")
         try:
             new_user_data = command.data.model_dump(exclude_unset=True)
+            logger.debug(f"Received user data for creation: {new_user_data}")
         except PydanticSerializationError:
+            logger.error("Data parsing error during user creation.")
             raise WebServiceError(
                 title="Parsing Error",
                 user_message="Data is required to create a user.",
@@ -58,6 +63,7 @@ class UserService:
             )
         try:
             password = new_user_data.pop("password")
+            logger.debug("Extracted password from user data.")
         except KeyError:
             logger.error("Password is missing while creating user.")
             raise WebServiceError(
@@ -69,16 +75,19 @@ class UserService:
             salt = bcrypt.gensalt()
             new_user_data["hashed_password"] = hash_password(password, salt)
             new_user_data["password_salt"] = salt
+            logger.debug("Password hashed and added to user data.")
             new_user = await self.user_repository.create(new_user_data)
-            logger.info(f"User created successfully: {new_user.id}")
+            logger.info(f"User created successfully with ID: {new_user.id}")
             user_data = self._to_user_representation(new_user, command)
             return UserResponseModel(
                 data=user_data, message="User successfully created!"
             )
 
     async def get_user(self, command: GetUserCommand) -> UserResponseModel:
+        logger.info(f"Fetching user with ID: {command.user_id}")
         try:
             user = await self.user_repository.get_user_by_id(command.user_id)
+            logger.debug(f"User data retrieved: {user}")
         except NoResultFound:
             logger.error(f"User with ID {command.user_id} not found.")
             raise WebServiceError(
@@ -99,28 +108,13 @@ class UserService:
     async def update_user(
         self, command: UpdateUserCommand
     ) -> UserResponseModel:
-        # try:
-
-        # user = await self.user_repository.get_user_by_id(command.user_id)
-        # # self.user_repository.update()
-
-        # if user is None:
-        #     logger.error(
-        #         f"User with ID {command.user_id} not found for update."
-        #     )
-        #     raise WebServiceError(
-        #         title="User Not Found",
-        #         description="The user could not be found to update.",
-        #         user_message="User not found. Please verify the ID and try again.",
-        #         error_category_type="NOT_FOUND_ERROR",
-        #         error_code=status.HTTP_404_NOT_FOUND,
-        #         kwargs={"command": command},
-        #     )
         try:
             _update_user_data = command.attributes.model_dump()
+            logger.debug(f"Update data received: {_update_user_data}")
             _update_user_data.pop("id", None)
             _password = _update_user_data.pop("password", None)
             if _password is not None:
+                logger.debug("Hashing new password for the user.")
                 salt = bcrypt.gensalt()
                 _update_user_data["password_salt"] = salt
                 _update_user_data["hashed_password"] = hash_password(
@@ -130,6 +124,7 @@ class UserService:
             res = await self.user_repository.update_by_id(
                 command.user_id, _update_user_data
             )
+            logger.info(f"User with ID {command.user_id} successfully updated.")
             user_data = self._to_user_representation(res, command)
             return UserResponseModel(
                 data=user_data, message="User successfully updated!"
@@ -137,32 +132,23 @@ class UserService:
         except Exception as e:
             logger.error(e)
             raise e
-        finally:
-            pass
 
     @db.transactional()
     async def delete_user(self, command: DeleteUserCommand) -> Any:
+        logger.info(f"Attempting to delete user with ID: {command.user_id}")
         try:
-            logger.info(
-                f"Attempting to delete user with ID: {command.user_id}"
-            )
             res = await self.user_repository.delete_by_id(command.user_id)
-            logger.info(res)
+            logger.debug(f"Delete operation result: {res}")
         except Exception as e:
-            logger.error(e)
+            logger.error(f"Error during deletion of user with ID {command.user_id}: {e}")
             raise WebServiceError(
-                title="User Not Found",
-                description=f"User with ID {command.user_id} could not be found for deletion.",
-                user_message="The user with the specified ID does not exist. Deletion failed.",
+                error_message="The user with the specified ID does not exist. Deletion failed.",
                 error_code=status.HTTP_404_NOT_FOUND,
-                error_category_type="NOT_FOUND_ERROR",
-                kwargs={"command": command},
+                is_public=True
             ) from e
         else:
             user_data = self._to_user_representation(res, command)
-            logger.info(
-                f"User with ID {command.user_id} deleted successfully."
-            )
+            logger.info(f"User with ID {command.user_id} deleted successfully.")
             return UserResponseModel(
                 data=user_data, message="User successfully deleted!"
             )
@@ -170,13 +156,19 @@ class UserService:
     async def get_many_users(
         self, command: GetManyUsersCommand
     ) -> UsersResponseModel:
-        logger.info(
-            f"Fetching users with query parameters: {command.query_params}"
-        )
 
-        users, total = await self.user_repository.get_many(
-            **command.query_params.model_dump()
-        )
+        logger.info(f"Fetching users with query parameters: {command.query_params}")
+
+        try:
+            users, total = await self.user_repository.get_many(
+                **command.query_params.model_dump()
+            )
+
+            logger.debug(f"Retrieved {len(users)} users with total count {total}.")
+
+        except Exception as e:
+            logger.error(f"Error during fetching users: {e}")
+            raise e
 
         if not users:
             logger.warning(
@@ -186,6 +178,7 @@ class UserService:
         users_data = [
             self._to_user_representation(user, command) for user in users
         ]
+
         return UsersResponseModel(
             data=users_data,
             message="Users successfully fetched!",
@@ -202,14 +195,16 @@ class UserService:
     def _to_user_representation(
         self, user: Any, command: BaseUserWebCommand
     ) -> BaseUserModel:
+        logger.debug(f"Converting user to representation with view type: {command.view_type}")
         model = user_views.get(command.view_type)
         if not model:
-            logger.error(f"Invalid user model view type: {command.view_type}")
             raise WebServiceError(
+<<<<<<< Updated upstream
+                error_message=f"Invalid user model view type: {command.view_type}",
+=======
                 title="Invalid View Type",
-                description="The specified view type for user data is invalid. The View Type Should be valid before reaching here",
+                error_message=f"Invalid View Type {command.view_type}",
+>>>>>>> Stashed changes
                 error_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                error_category_type="DEVELOPER_ERROR",
-                error_severity="CRITICAL_SHUTDOWN",
             )
         return model.model_validate(user)

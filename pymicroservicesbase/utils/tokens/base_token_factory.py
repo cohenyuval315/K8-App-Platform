@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 
 
 class BaseTokenFactory(ABC):
+    token_type = None
+
     def __init__(self, *args: Any, **kwargs: Any):
         self.token = None
         self.configure(*args, **kwargs)

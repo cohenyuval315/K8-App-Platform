@@ -5,9 +5,6 @@ from pymicroservicesbase.services.authentication_service.src.authentication.api.
     AuthenticationControllerDep,
 )
 
-from pymicroservicesbase.services.authentication_service.src.authentication.api.routes.session_router import (
-    session_router,
-)
 from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.login.login_command import (
     LoginCommandDep,
 )
@@ -23,18 +20,17 @@ from pymicroservicesbase.services.authentication_service.src.authentication.appl
     RefreshCommandDep,
 )
 
-from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.get_user_authentication_data_command import (
-    GetUserAuthenticationDataCommandDep,
+from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.get_user_identity_command import (
+    GetUserIdentityCommandDep,
 )
 
-from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.get_product_authentication_data_command import (
-    GetProductAuthenticationDataCommandDep,
-)
 from pymicroservicesbase.services.authentication_service.src.authentication.application.responses.refresh_responses import (
     RefreshResponseModel,
 )
 
-
+from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.account_recovery.account_recovery_command import (
+    AccountRecoveryCommandDep,
+)
 from pymicroservicesbase.services.authentication_service.src.authentication.application.commands.logout.logout_command import (
     LogoutCommandDep,
 )
@@ -58,7 +54,6 @@ authentication_router = WebRouter(
     prefix="/auth",
     tags=["authentication"],
 )
-authentication_router.include_router(session_router)
 
 
 @authentication_router.post(
@@ -69,18 +64,6 @@ async def register(
     authentication_controller: AuthenticationControllerDep,
 ) -> RegisterResponseModel:
     return await authentication_controller.register(command)
-
-
-@authentication_router.post(
-    "/confirm",
-    status_code=200,
-    # response_model=RegisterResponseModel
-)
-async def confirm(
-    command: RegisterCommandDep,
-    authentication_controller: AuthenticationControllerDep,
-):
-    return await authentication_controller.confirm_registration()
 
 
 @authentication_router.post(
@@ -125,41 +108,16 @@ async def verify(
 
 
 @authentication_router.post(
-    "/session/{user_id}",
+    "/{user_id}",
     status_code=200,
 )
-async def get_user_authentication_data(
-    command: GetUserAuthenticationDataCommandDep,
+async def get_user_identity(
+    command: GetUserIdentityCommandDep,
     authentication_controller: AuthenticationControllerDep,
-) -> Response:
+):
     return await authentication_controller.get_user_authentication_data(
         command
     )
-
-
-@authentication_router.post(
-    "/product/{product_id}",
-    status_code=200,
-)
-async def get_product_authentication_data(
-    command: GetProductAuthenticationDataCommandDep,
-    authentication_controller: AuthenticationControllerDep,
-) -> Response:
-    return await authentication_controller.get_product_authentication_data(
-        command
-    )
-
-
-# @authentication_router.post(
-#     "/authenticate",
-#     status_code=200,
-#     response_model=AuthenticationResponseModel
-# )
-# async def authenticate(
-#     command: AuthenticationCommand,
-#     authentication_controller: AuthenticationControllerDep,
-# ) -> AuthenticationResponseModel | None:
-#     return await authentication_controller.authenticate(command)
 
 
 @authentication_router.get("/whoami", status_code=200, response_model=Any)
@@ -170,13 +128,24 @@ async def whoami(
     return await authentication_controller.whoami(command)
 
 
+@authentication_router.post(
+    "/recovery",
+    status_code=200,
+)
+async def account_recovery(
+    command: AccountRecoveryCommandDep,
+    authentication_controller: AuthenticationControllerDep,
+):
+    return await authentication_controller.account_recovery(command)
+
+
 # @authentication_router.post(
-#     "/recovery",
+#     "/confirm",
 #     status_code=200,
-#     response_model=AccountRecoveryResponseModel
+#     # response_model=RegisterResponseModel
 # )
-# async def account_recovery(
-#     command:AccountRecoveryCommand,
+# async def confirm(
+#     # command: ConfirmCommandDep,
 #     authentication_controller: AuthenticationControllerDep,
-# ) -> AccountRecoveryResponseModel:
-#     return await authentication_controller.account_recovery(command)
+# ):
+#     return await authentication_controller.confirm_registration()

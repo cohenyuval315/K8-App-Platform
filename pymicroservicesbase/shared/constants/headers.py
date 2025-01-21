@@ -82,6 +82,7 @@ ACCESS_CONTROL_ALLOW_HEADERS_HEADER_KEY = "Access-Control-Allow-Headers"
 ACCESS_CONTROL_EXPOSE_HEADERS_HEADER_KEY = "Access-Control-Expose-Headers"
 ACCESS_CONTROL_MAX_AGE_HEADER_KEY = "Access-Control-Max-Age"
 TRANSFER_ENCODING_HEADER_KEY = "TE"  # Transfer Encoding
+TRANSFER_ENCODING_HEADER_KEY = "Transfer-Encoding"  # Transfer Encoding
 VIA_HEADER_KEY = "Via"
 WARNING_HEADER_KEY = "Warning"
 PRAGMA_HEADER_KEY = "Pragma"

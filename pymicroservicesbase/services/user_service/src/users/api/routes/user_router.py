@@ -24,6 +24,7 @@ from pymicroservicesbase.services.user_service.src.users.application.commands.up
     UpdateUserCommandDep,
 )
 
+
 user_router = WebRouter(
     prefix="/users",
     tags=["users"],

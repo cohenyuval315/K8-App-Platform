@@ -89,6 +89,28 @@ def generate_test_key_value(length: int = 0) -> Tuple[str, Any]:
     return (key, value)
 
 
+def generate_flat_test_key_value() -> Tuple[str, Any]:
+    key = generate_test_key()
+    value_type = random.choice(
+        [
+            generate_test_string,
+            generate_test_number,
+        ]
+    )
+    value = str(value_type())
+    return (key, value)
+
+
+def generate_test_flat_keys_values(
+    length: int = DEFAULT_MAPPING_KEYS_LENGTH,
+) -> List[Tuple[str, Any]]:
+    results = []
+    for _ in range(length):
+        (key, value) = generate_flat_test_key_value()
+        results.append((key, value))
+    return results
+
+
 def generate_test_keys_values(
     length: int = DEFAULT_MAPPING_KEYS_LENGTH,
 ) -> List[Tuple[str, Any]]:
@@ -103,7 +125,7 @@ def generate_test_flat_mapping(
     length: int = DEFAULT_MAPPING_KEYS_LENGTH,
 ) -> Dict[str, Any]:
     mapping = {}
-    lst = generate_test_keys_values(length)
+    lst = generate_test_flat_keys_values(length)
     for key, value in lst:
         mapping[key] = value
     return mapping

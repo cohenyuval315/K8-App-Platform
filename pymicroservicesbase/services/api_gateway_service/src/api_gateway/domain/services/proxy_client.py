@@ -99,6 +99,12 @@ class ProxyClient(metaclass=SingletonMeta):
         headers.pop(CONTENT_LENGTH_HEADER_KEY, None)
         headers.pop(HOST_HEADER_KEY, None)
 
+        # transfer_encoding = headers.get(TRANSFER_ENCODING_HEADER_KEY, None)
+        # if transfer_encoding == "chunked":
+        #     is_stream = True
+        # else:
+        #     is_stream = False
+
         _request = self.client.build_request(
             method=method,
             url=url,

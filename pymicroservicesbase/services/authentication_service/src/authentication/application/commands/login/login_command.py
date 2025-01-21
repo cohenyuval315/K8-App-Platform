@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Annotated
+from typing import Annotated, Dict
 
-from fastapi import Body, Depends, Header, Request, Response
+from fastapi import Body, Depends, Header, Query, Request, Response
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import ConfigDict
 
@@ -140,9 +140,11 @@ class LoginCommand(BaseWebCommand):
     )
     login_method: str
     # product: Dict[str, Any]
+    provider: str | None
     response: Response
     request: Request
     product_id: str
+    data: dict
 
 
 async def get_login_command(
@@ -150,16 +152,21 @@ async def get_login_command(
     response: Response,
     request: Request,
     # product: Dict[str, Any] = Body(embed=True),
-    login_method: str = Body(embed=True),
-    product_id: str = Header(default=None, alias=PRODUCT_HEADER_KEY),
-    provider: str | None = Body(embed=True, default=None),
+    login_method: str = Query(default="password"),
+    product_id: str = Header(default="test", alias=PRODUCT_HEADER_KEY),
+    provider: str | None = Query(default=None),
+    data: dict[str, str] = Body(
+        ..., examples=[{"username": "test", "password": "test"}]
+    ),
 ):
     command = LoginCommand(
         login_method=login_method,
         response=response,
+        provider=provider,
         request=request,
         # product=product,
         product_id=product_id,
+        data=data,
     )
     return command
 
