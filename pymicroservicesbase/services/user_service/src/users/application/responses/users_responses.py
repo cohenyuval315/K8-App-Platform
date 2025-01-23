@@ -6,11 +6,11 @@ from pymicroservicesbase.sdk.web_api.core_api.responses.base_response_schema imp
     BaseResponseSchema,
 )
 
-from pymicroservicesbase.services.user_service.src.users.application.schemas.base_user import (
-    BaseUserModel,
+from pymicroservicesbase.services.user_service.src.users.application.schemas.base_user_view import (
+    BaseUserViewModel,
 )
 
-T = TypeVar("T", bound=BaseUserModel)
+T = TypeVar("T", bound=BaseUserViewModel)
 
 
 class UsersResponseModel(BaseResponseSchema[List[T]]):

@@ -1,11 +1,11 @@
 from pydantic import Field
-from pymicroservicesbase.services.user_service.src.users.application.schemas.base_user import (
-    BaseUserModel,
+from pymicroservicesbase.services.user_service.src.users.application.schemas.base_user_view import (
+    BaseUserViewModel,
 )
 from datetime import datetime
 
 
-class AdminUserModel(BaseUserModel):
+class AdminUserModel(BaseUserViewModel):
     id: str | None
     first_name: str | None
     last_name: str | None

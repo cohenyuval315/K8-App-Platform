@@ -1,10 +1,9 @@
 from pydantic import Field
-from pymicroservicesbase.services.user_service.src.users.application.schemas.base_user import (
-    BaseUserModel,
+from pymicroservicesbase.services.user_service.src.users.application.schemas.base_user_view import (
+    BaseUserViewModel,
 )
 
-
-class MinimalUserModel(BaseUserModel):
+class MinimalUserModel(BaseUserViewModel):
     id: str
     first_name: str | None
     last_name: str | None

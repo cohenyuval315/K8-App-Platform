@@ -1,6 +1,7 @@
-from typing import Any
+from typing import Any, List, Sequence
 import bcrypt
 from fastapi import status
+from pydantic import TypeAdapter
 from pydantic_core import PydanticSerializationError
 
 from pymicroservicesbase.sdk.web_api.core_api.errors.web_service_error import (
@@ -22,10 +23,10 @@ from pymicroservicesbase.services.user_service.src.users.application import (
 from pymicroservicesbase.services.user_service.src.users.application.commands.base_user_web_command import (
     BaseUserWebCommand,
 )
-from pymicroservicesbase.services.user_service.src.users.application.schemas.base_user import (
-    BaseUserModel,
+from pymicroservicesbase.services.user_service.src.users.application.schemas.base_user_view import (
+    BaseUserViewModel,
 )
-from pymicroservicesbase.services.user_service.src.users.application.schemas.views.user_views import (
+from pymicroservicesbase.services.user_service.src.users.application.schemas.user_views import (
     user_views,
 )
 
@@ -175,9 +176,12 @@ class UserService:
                 f"No users found for the provided query parameters: {command.query_params}"
             )
 
-        users_data = [
-            self._to_user_representation(user, command) for user in users
-        ]
+        # users_data = [
+        #     self._to_user_representation(user, command) for user in users
+        # ]
+        # model = user_views.get(command.view_type)
+        users_data = TypeAdapter(list[command.get_view_model()]).validate_python(users)
+
 
         return UsersResponseModel(
             data=users_data,
@@ -192,19 +196,39 @@ class UserService:
             },
         )
 
+
+
     def _to_user_representation(
         self, user: Any, command: BaseUserWebCommand
-    ) -> BaseUserModel:
+    ) -> BaseUserViewModel:
         logger.debug(f"Converting user to representation with view type: {command.view_type}")
-        model = user_views.get(command.view_type)
-        if not model:
-            raise WebServiceError(
-<<<<<<< Updated upstream
-                error_message=f"Invalid user model view type: {command.view_type}",
-=======
-                title="Invalid View Type",
-                error_message=f"Invalid View Type {command.view_type}",
->>>>>>> Stashed changes
-                error_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-        return model.model_validate(user)
+        return command.get_view_model().model_validate(user)
+
+        # model = user_views.get(command.view_type)
+        # if not model:
+        #     logger.error(f"Invalid user model view type: {command.view_type}")
+        #     raise WebServiceError(
+        #         error_message=f"Invalid user model view type: {command.view_type}",
+        #         error_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        #     )
+        # return model.model_validate(user)
+
+
+    # def _to_users_representation(
+    #     self, users: Any, command: BaseUserWebCommand
+    # ) -> Sequence[BaseUserViewModel]:
+    #     logger.debug(f"Converting user to representation with view type: {command.view_type}")
+    #     model = user_views.get(command.view_type)
+    #     if not model:
+    #         logger.error(f"Invalid user model view type: {command.view_type}")
+    #         raise WebServiceError(
+    #             error_message=f"Invalid user model view type: {command.view_type}",
+    #             error_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    #         )
+    #     model = user_views.get(command.view_type)
+    #     users_data = TypeAdapter(Sequence[model]).validate_python(users)
+    #     return users_data
+
+
+
+

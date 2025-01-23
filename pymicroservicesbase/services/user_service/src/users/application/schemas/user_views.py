@@ -1,7 +1,7 @@
 from typing import Dict, Literal, Type
 
-from pymicroservicesbase.services.user_service.src.users.application.schemas.base_user import (
-    BaseUserModel,
+from pymicroservicesbase.services.user_service.src.users.application.schemas.base_user_view import (
+    BaseUserViewModel,
 )
 from pymicroservicesbase.services.user_service.src.users.application.schemas.views.admin_user import (
     AdminUserModel,
@@ -24,7 +24,7 @@ UserViewType = Literal[
     "admin", "full", "owner", "public", "minimal", "internal"
 ]
 
-user_views: Dict[UserViewType, Type[BaseUserModel]] = {
+user_views: Dict[UserViewType, Type[BaseUserViewModel]] = {
     "admin": AdminUserModel,
     "full": FullUserModel,
     "owner": OwnerUserModel,

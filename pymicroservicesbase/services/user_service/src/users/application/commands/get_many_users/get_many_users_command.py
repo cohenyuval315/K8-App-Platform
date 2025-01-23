@@ -1,8 +1,7 @@
 from typing import Annotated
-from fastapi import Depends
+from fastapi import Depends, Query
 from pymicroservicesbase.services.user_service.src.users.application.commands.base_user_web_command import (
-    BaseUserWebCommand,
-    BaseUserCommandDep,
+    BaseUserWebCommand,BaseUserCommandDep
 )
 
 # from pymicroservicesbase.sdk.web_api.common.schemas.get_many_schema import GetManySchema
@@ -17,15 +16,13 @@ class GetManyUsersCommand(BaseUserWebCommand):
 
 
 async def get_get_many_users_command(
-    base_user_command: BaseUserCommandDep, query_params: QueryParamsDep
+    base_user_command:BaseUserCommandDep,
+    query_params:QueryParamsDep
 ) -> GetManyUsersCommand:
-    _base_user_command = base_user_command.model_dump()
-    _data = query_params.model_dump()
-    merged_data = {**_base_user_command, "query_params": {**_data}}
-    command = GetManyUsersCommand(
-        **merged_data,
+    return GetManyUsersCommand(
+        **base_user_command.model_dump(),
+        query_params=query_params
     )
-    return command
 
 
 GetManyUsersCommandDep = Annotated[

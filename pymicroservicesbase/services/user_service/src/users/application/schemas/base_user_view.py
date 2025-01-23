@@ -27,7 +27,7 @@ class UserSchema(IdentifierSchema, BaseModel):
     )
 
 
-class BaseUserModel(BaseModel):
+class BaseUserViewModel(BaseModel):
     model_config = ConfigDict(
         # validate_default=
         extra="allow",
