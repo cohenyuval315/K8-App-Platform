@@ -18,17 +18,22 @@ from pymicroservicesbase.services.user_service.src.users.application.schemas.vie
 from pymicroservicesbase.services.user_service.src.users.application.schemas.views.public_user import (
     PublicUserModel,
 )
+import enum
 
+class UserViewType(str, enum.Enum):
+    ADMIN = "admin"
+    FULL = "full"
+    OWNER = "owner"
+    PUBLIC = "public"
+    MINIMAL = "minimal"
+    INTERNAL = "internal"
 
-UserViewType = Literal[
-    "admin", "full", "owner", "public", "minimal", "internal"
-]
 
 user_views: Dict[UserViewType, Type[BaseUserViewModel]] = {
-    "admin": AdminUserModel,
-    "full": FullUserModel,
-    "owner": OwnerUserModel,
-    "public": PublicUserModel,
-    "minimal": MinimalUserModel,
-    "internal": MinimalUserModel,
+    UserViewType.ADMIN : AdminUserModel,
+    UserViewType.FULL : FullUserModel,
+    UserViewType.OWNER : OwnerUserModel,
+    UserViewType.PUBLIC : PublicUserModel,
+    UserViewType.MINIMAL : MinimalUserModel,
+    UserViewType.INTERNAL : MinimalUserModel,
 }
